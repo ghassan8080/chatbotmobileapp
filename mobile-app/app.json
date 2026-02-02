@@ -1,0 +1,49 @@
+{
+    "name": "ProductManagementApp",
+    "displayName": "إدارة المنتجات",
+    "expo": {
+        "name": "Product Management",
+        "slug": "product-management-app",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "light",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#4CAF50"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.productmanagement.app",
+            "infoPlist": {
+                "NSCameraUsageDescription": "نحتاج إلى الوصول إلى الكاميرا لالتقاط صور المنتجات",
+                "NSPhotoLibraryUsageDescription": "نحتاج إلى الوصول إلى معرض الصور لتحميل صور المنتجات"
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#4CAF50"
+            },
+            "package": "com.productmanagement.app",
+            "permissions": [
+                "android.permission.CAMERA",
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+            ]
+        },
+        "plugins": [
+            [
+                "react-native-image-picker",
+                {
+                    "cameraPermission": "نحتاج إلى الوصول إلى الكاميرا لالتقاط صور المنتجات"
+                }
+            ]
+        ]
+    },
+    "supportsRTL": true
+}

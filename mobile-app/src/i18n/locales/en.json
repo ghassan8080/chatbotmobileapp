@@ -1,0 +1,56 @@
+{
+    "app": {
+        "title": "📦 Product Management",
+        "name": "Product Management"
+    },
+    "common": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "success": "Success",
+        "error": "Error",
+        "loading": "Loading...",
+        "retry": "Retry",
+        "close": "Close",
+        "dinar": "Dinar",
+        "search": "Search..."
+    },
+    "product": {
+        "title": "Products",
+        "addProduct": "➕ Add Product",
+        "editProduct": "✏️ Edit Product",
+        "productDetails": "Product Details",
+        "noProducts": "No products found",
+        "pullToRefresh": "Pull to refresh",
+        "name": "Product Name",
+        "description": "Product Description",
+        "price": "Price",
+        "images": "Images",
+        "actions": "Actions",
+        "deleteConfirm": "Are you sure you want to delete this product?",
+        "deleteSuccess": "Product deleted successfully",
+        "addSuccess": "Product added successfully",
+        "updateSuccess": "Product updated successfully",
+        "selectImages": "Select Images (up to 4)",
+        "takePhoto": "Take Photo",
+        "chooseFromGallery": "Choose from Gallery",
+        "removeImage": "Remove Image"
+    },
+    "form": {
+        "required": "This field is required",
+        "namePlaceholder": "Enter product name",
+        "descriptionPlaceholder": "Enter product description",
+        "pricePlaceholder": "Enter price"
+    },
+    "errors": {
+        "networkError": "Network error. Please check your internet connection",
+        "serverError": "Server error occurred",
+        "unknownError": "An unexpected error occurred",
+        "invalidInput": "Invalid input data",
+        "imageTooLarge": "Image too large (max 5MB)",
+        "invalidImageType": "Unsupported image type"
+    }
+}

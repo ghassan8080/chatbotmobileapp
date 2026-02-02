@@ -1,0 +1,60 @@
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# React Native
+.expo/
+.expo-shared/
+*.expo
+
+# Metro
+metro-cache/
+
+# Misc
+.env
+*.log
+*.tmp
+*.swp
+
+# Coverage
+coverage/
+
+# Android/iOS build
+android/
+ios/
+
+# Public uploads (if not needed)
+picture_error/
+
+# Ignore local environment files
+*.local
+
+# Ignore test snapshots
+__snapshots__/
+
+# Ignore web build
+web-build/
+
+# Ignore generated files
+*.bak
+*.orig
+*.rej
+
+# Ignore package-lock if using yarn
+yarn.lock

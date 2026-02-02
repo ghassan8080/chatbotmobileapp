@@ -1,0 +1,169 @@
+{
+  "name": "Authentication & Multi-Tenant Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "login",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-368, 100],
+      "id": "login-webhook",
+      "name": "POST /login",
+      "webhookId": "login-webhook-id-here"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract email and password from request body\nconst { email, password } = $json.body;\n\nif (!email || !password) {\n  throw new Error('البريد الإلكتروني وكلمة المرور مطلوبان');\n}\n\nif (!email.includes('@')) {\n  throw new Error('البريد الإلكتروني غير صحيح');\n}\n\nif (password.length < 6) {\n  throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');\n}\n\nreturn [{\n  json: {\n    email: email.toLowerCase().trim(),\n    password: password,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [0, 100],
+      "id": "validate-credentials",
+      "name": "Validate Credentials"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "user-credentials-table-id",
+          "mode": "list",
+          "cachedResultName": "user_credentials"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{$json.email}}"
+            }
+          ]
+        },
+        "returnAll": false
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [368, 100],
+      "id": "get-user",
+      "name": "Get User from DB"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{$json.length}}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [736, 100],
+      "id": "check-user-exists",
+      "name": "User Exists?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate password verification (in production, use bcrypt)\nconst userRecord = $input.first().json;\nconst submittedPassword = $node['Validate Credentials'].json.password;\nconst hashedPassword = userRecord.password_hash;\n\n// Simple comparison (replace with bcrypt.compare in production)\nconst passwordMatch = submittedPassword === hashedPassword;\n\nif (!passwordMatch) {\n  throw new Error('كلمة المرور غير صحيحة');\n}\n\n// Generate token (simple UUID - use JWT in production)\nconst token = 'TOKEN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\nreturn [{\n  json: {\n    user_id: userRecord.id || userRecord.user_id,\n    email: userRecord.email,\n    token: token,\n    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1104, 100],
+      "id": "verify-password",
+      "name": "Verify Password & Generate Token"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{{\n  \"user_id\": $json.user_id,\n  \"token\": $json.token,\n  \"email\": $json.email,\n  \"expires_at\": $json.expires_at,\n  \"message\": \"تم تسجيل الدخول بنجاح ✅\"\n}}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1472, 0],
+      "id": "respond-success",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{{\n  \"error\": \"البريد الإلكتروني غير مسجل\",\n  \"message\": \"هذا البريد الإلكتروني لم يتم تسجيله في النظام\"\n}}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1104, 256],
+      "id": "respond-user-not-found",
+      "name": "Respond - User Not Found"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Catch password verification errors\nconst error = arguments[0];\nreturn [{\n  json: {\n    error: error?.message || 'خطأ في التحقق من كلمة المرور'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1472, 256],
+      "id": "handle-password-error",
+      "name": "Handle Password Error"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{{\n  \"error\": $json.error,\n  \"message\": \"فشل تسجيل الدخول\"\n}}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1728, 256],
+      "id": "respond-error",
+      "name": "Respond Error"
+    }
+  ],
+  "connections": {
+    "login-webhook": {
+      "main": [[{ "node": "validate-credentials", "type": "main", "index": 0 }]]
+    },
+    "validate-credentials": {
+      "main": [[{ "node": "get-user", "type": "main", "index": 0 }]]
+    },
+    "get-user": {
+      "main": [[{ "node": "check-user-exists", "type": "main", "index": 0 }]]
+    },
+    "check-user-exists": {
+      "main": [
+        [{ "node": "verify-password", "type": "main", "index": 0 }],
+        [{ "node": "respond-user-not-found", "type": "main", "index": 0 }]
+      ]
+    },
+    "verify-password": {
+      "main": [[{ "node": "respond-success", "type": "main", "index": 0 }]]
+    },
+    "respond-user-not-found": {
+      "main": [[]]
+    },
+    "handle-password-error": {
+      "main": [[{ "node": "respond-error", "type": "main", "index": 0 }]]
+    },
+    "respond-error": {
+      "main": [[]]
+    }
+  }
+}

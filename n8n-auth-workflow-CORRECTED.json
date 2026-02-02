@@ -1,0 +1,227 @@
+{
+  "name": "Authentication Workflow - CORRECTED",
+  "description": "Fixed login workflow with proper error handling",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "login",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-544, 2400],
+      "id": "9dc96faa-b465-4f9b-b4a4-8c1e9fce7f15",
+      "name": "POST /login",
+      "webhookId": "login-webhook-id-here"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract email and password from request body\nconst { email, password } = $json.body;\n\nif (!email || !password) {\n  throw new Error('البريد الإلكتروني وكلمة المرور مطلوبان');\n}\n\nif (!email.includes('@')) {\n  throw new Error('البريد الإلكتروني غير صحيح');\n}\n\nif (password.length < 6) {\n  throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');\n}\n\nreturn [{\n  json: {\n    email: email.toLowerCase().trim(),\n    password: password,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-352, 2400],
+      "id": "363e1c9f-697e-42ef-8a5c-da4fb2632baa",
+      "name": "Validate Credentials"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "q2ib8AqLNPalhXAU",
+          "mode": "list",
+          "cachedResultName": "user_credentials",
+          "cachedResultUrl": "/projects/sn1NBlnUqMfbcSDa/datatables/q2ib8AqLNPalhXAU"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{$json.email}}"
+            }
+          ]
+        },
+        "returnAll": false
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [-144, 2400],
+      "id": "e9a46c80-703c-46d8-902c-9ac5f4ef52c2",
+      "name": "Get User from DB"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{$json.length}}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [96, 2400],
+      "id": "fd2a3bfb-656d-4ff8-939f-f137ba19cc8f",
+      "name": "User Exists?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract first user record from array\nconst users = $json;\nif (!Array.isArray(users) || users.length === 0) {\n  throw new Error('لم يتم العثور على المستخدم');\n}\n\nconst userRecord = users[0].json || users[0];\nreturn [{\n  json: userRecord\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [304, 2320],
+      "id": "extract-user-record",
+      "name": "Extract User Record"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify password and generate token\nconst userRecord = $json;\nconst submittedPassword = $node['Validate Credentials'].json.password;\nconst storedPassword = userRecord.password_hash || userRecord.password;\n\n// Direct comparison (in production, use bcrypt.compare)\nconst passwordMatch = submittedPassword === storedPassword;\n\nif (!passwordMatch) {\n  throw new Error('كلمة المرور غير صحيحة');\n}\n\n// Ensure user_id exists\nif (!userRecord.id && !userRecord.user_id) {\n  throw new Error('معرف المستخدم غير موجود في السجل');\n}\n\n// Generate token (simple format - replace with JWT in production)\nconst token = 'TOKEN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\nconst userId = userRecord.id || userRecord.user_id;\n\nreturn [{\n  json: {\n    user_id: userId,\n    email: userRecord.email,\n    name: userRecord.name || '',\n    token: token,\n    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [416, 2320],
+      "id": "ce9ed98c-889d-456d-9906-f83620e753d1",
+      "name": "Verify Password & Generate Token"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{{\n  \"success\": true,\n  \"user_id\": $json.user_id,\n  \"token\": $json.token,\n  \"email\": $json.email,\n  \"name\": $json.name,\n  \"expires_at\": $json.expires_at,\n  \"message\": \"تم تسجيل الدخول بنجاح ✅\"\n}}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [688, 2320],
+      "id": "a3d1d9df-2322-477f-bd97-2aca41f72e8e",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{{\n  \"success\": false,\n  \"error\": \"البريد الإلكتروني غير مسجل\",\n  \"message\": \"هذا البريد الإلكتروني لم يتم تسجيله في النظام\"\n}}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [432, 2528],
+      "id": "b87c2019-d3c3-475a-80e6-b94a07602909",
+      "name": "Respond - User Not Found"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{{\n  \"success\": false,\n  \"error\": $json.error_message || \"خطأ في التحقق من بيانات المستخدم\",\n  \"message\": \"فشل تسجيل الدخول\"\n}}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [688, 2528],
+      "id": "respond-auth-error",
+      "name": "Respond - Auth Error"
+    }
+  ],
+  "connections": {
+    "POST /login": {
+      "main": [
+        [
+          {
+            "node": "Validate Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Credentials": {
+      "main": [
+        [
+          {
+            "node": "Get User from DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User from DB": {
+      "main": [
+        [
+          {
+            "node": "User Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Exists?": {
+      "main": [
+        [
+          {
+            "node": "Extract User Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - User Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract User Record": {
+      "main": [
+        [
+          {
+            "node": "Verify Password & Generate Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Password & Generate Token": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond - User Not Found": {
+      "main": [[]]
+    },
+    "Respond - Auth Error": {
+      "main": [[]]
+    }
+  ],
+  "pinData": {},
+  "meta": {
+    "instanceId": "bea4992fa64c641cadbe95aade28ba826ee2da2142716cf2cc76621e7fd0115f"
+  }
+}

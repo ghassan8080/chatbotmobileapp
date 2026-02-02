@@ -1,0 +1,327 @@
+// n8n Function Node - Render HTML
+
+const rows = $input.all();
+let html = '';
+
+html += `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+font-family:Tahoma;
+background:#f4f6f8;
+padding:15px;
+}
+
+h2{text-align:center;color:#1a5f7a}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:15px;
+}
+
+.card{
+background:white;
+border-radius:12px;
+padding:12px;
+box-shadow:0 4px 8px rgba(0,0,0,.1);
+}
+
+.card img{
+width:70px;
+height:70px;
+border-radius:6px;
+object-fit:cover;
+margin:3px;
+}
+
+.actions{
+display:flex;
+gap:5px;
+margin-top:8px;
+}
+
+.actions button{
+flex:1;
+padding:6px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+color:white;
+}
+
+.edit{background:#f59e0b}
+.delete{background:#ef4444}
+
+.add-btn{
+background:#22c55e;
+color:white;
+border:none;
+padding:10px 16px;
+border-radius:8px;
+margin-bottom:10px;
+cursor:pointer;
+}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.6);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+.modal.show{display:flex;}
+
+.modal-box{
+background:white;
+padding:20px;
+width:350px;
+border-radius:12px;
+}
+
+.modal-box h3{
+text-align:center;
+margin-bottom:10px;
+}
+
+.form-group{
+margin-bottom:10px;
+}
+
+.form-group input,
+.form-group textarea{
+width:100%;
+padding:8px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.upload-box{
+border:2px dashed #1a5f7a;
+padding:12px;
+border-radius:8px;
+text-align:center;
+cursor:pointer;
+color:#1a5f7a;
+}
+
+.preview{
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+margin-top:8px;
+}
+
+.preview img{
+width:60px;
+height:60px;
+border-radius:6px;
+object-fit:cover;
+}
+
+.save-btn{
+background:#22c55e;
+color:white;
+border:none;
+padding:10px;
+width:100%;
+border-radius:6px;
+margin-top:8px;
+}
+
+.cancel-btn{
+background:#ef4444;
+color:white;
+border:none;
+padding:10px;
+width:100%;
+border-radius:6px;
+margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📦 إدارة المنتجات</h2>
+<button class="add-btn" onclick="openModal()">➕ إضافة منتج</button>
+
+<div class="grid">
+`;
+
+for (const p of rows) {
+  const d = p.json;
+  const name = (d.name || '').replace(/'/g,"&#39;");
+  const desc = (d.description || '').replace(/'/g,"&#39;");
+  const price = d.price || 0;
+  const id = d.id;
+
+  const imgs = [];
+  if(d.image_url_1) imgs.push(d.image_url_1);
+  if(d.image_url_2) imgs.push(d.image_url_2);
+  if(d.image_url_3) imgs.push(d.image_url_3);
+  if(d.image_url_4) imgs.push(d.image_url_4);
+
+  html += `<div class="card">
+<h4>${name}</h4>
+<p>${desc}</p>
+<b>${price} دينار</b>
+<div>`;
+  imgs.forEach(i=>{
+    html += `<img src="${i}">`;
+  });
+  html += `</div>
+
+<div class="actions">
+<button class="edit" onclick="editProduct(${id},'${name}','${desc}',${price})">✏️ تعديل</button>
+<button class="delete" onclick="deleteProduct(${id})">🗑 حذف</button>
+</div>
+</div>`;
+}
+
+html += `</div>
+
+<div class="modal" id="modal">
+<div class="modal-box">
+
+<h3 id="title">إضافة منتج</h3>
+<input type="hidden" id="pid">
+
+<div class="form-group">
+<input id="name" placeholder="اسم المنتج">
+</div>
+
+<div class="form-group">
+<textarea id="desc" placeholder="الوصف"></textarea>
+</div>
+
+<div class="form-group">
+<input id="price" type="number" placeholder="السعر">
+</div>
+
+<div class="form-group">
+<div class="upload-box" onclick="document.getElementById('images').click()">
+<i class="fa fa-cloud-upload"></i> رفع صور
+</div>
+<input type="file" id="images" multiple accept="image/*" hidden>
+<div class="preview" id="preview"></div>
+</div>
+
+<button class="save-btn" onclick="save()">💾 حفظ</button>
+<button class="cancel-btn" onclick="closeModal()">❌ إلغاء</button>
+
+</div>
+</div>
+
+<script>
+
+let selectedImages=[];
+
+function openModal(){
+ document.getElementById("modal").classList.add("show");
+ reset();
+}
+
+function closeModal(){
+ document.getElementById("modal").classList.remove("show");
+}
+
+function reset(){
+ document.getElementById("pid").value="";
+ document.getElementById("name").value="";
+ document.getElementById("desc").value="";
+ document.getElementById("price").value="";
+ document.getElementById("preview").innerHTML="";
+ selectedImages=[];
+}
+
+document.getElementById("images").addEventListener("change",function(){
+ selectedImages=[...this.files];
+ const preview=document.getElementById("preview");
+ preview.innerHTML="";
+ selectedImages.forEach(file=>{
+  const r=new FileReader();
+  r.onload=e=>{
+   const img=document.createElement("img");
+   img.src=e.target.result;
+   preview.appendChild(img);
+  }
+  r.readAsDataURL(file);
+ });
+});
+
+function editProduct(id,name,desc,price){
+ openModal();
+ document.getElementById("title").innerText="تعديل منتج";
+ document.getElementById("pid").value=id;
+ document.getElementById("name").value=name;
+ document.getElementById("desc").value=desc;
+ document.getElementById("price").value=price;
+}
+
+async function save(){
+ const id=document.getElementById("pid").value;
+ const name=document.getElementById("name").value;
+ const desc=document.getElementById("desc").value;
+ const price=document.getElementById("price").value;
+
+ let imagesData={};
+
+ for(let i=0;i<selectedImages.length;i++){
+  const b64=await toBase64(selectedImages[i]);
+  imagesData["image_base64_"+(i+1)]=b64;
+ }
+
+ let url=id
+ ? "https://n8n-n8n.17m6co.easypanel.host/webhook/update-product"
+ : "https://n8n-n8n.17m6co.easypanel.host/webhook/add-product";
+
+ let payload={name,description:desc,price:Number(price),...imagesData};
+ if(id) payload.product_id=id;
+
+ await fetch(url,{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify(payload)
+ });
+
+ alert("تم الحفظ");
+ location.reload();
+}
+
+function deleteProduct(id){
+ if(!confirm("تأكيد الحذف؟")) return;
+
+ fetch("https://n8n-n8n.17m6co.easypanel.host/webhook/delete-product",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({product_id:id})
+ }).then(()=>location.reload());
+}
+
+function toBase64(file){
+ return new Promise((res,rej)=>{
+  const r=new FileReader();
+  r.onload=()=>res(r.result);
+  r.onerror=e=>rej(e);
+  r.readAsDataURL(file);
+ });
+}
+
+</script>
+
+</body>
+</html>`;
+
+return [{json:{html}}];
