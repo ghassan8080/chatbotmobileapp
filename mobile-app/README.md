@@ -149,6 +149,31 @@ npm run tsc
 npm run lint
 ```
 
+## 🤖 CI/CD Pipeline
+
+This project uses GitHub Actions for Continuous Integration and Continuous Deployment. The workflows are defined in the `.github/workflows` directory.
+
+### PR Validation
+
+The `pr-validation.yml` workflow runs on every pull request against the `main` branch. It performs the following checks:
+
+- **Installs Dependencies**: Installs `npm` dependencies.
+- **Runs Tests**: Executes the test suite using `jest`.
+- **Lints Code**: Checks the code for linting errors using `eslint`.
+- **Type Checks**: Performs a static type check using `typescript`.
+
+This ensures that code is verified before being merged into the main branch.
+
+### Main Branch Build
+
+The `main-build.yml` workflow runs on every push to the `main` branch. It performs the following steps:
+
+- **Installs Dependencies**: Installs `npm` dependencies.
+- **Builds Android App**: Builds the release APK for the Android app.
+- **Uploads Artifact**: Uploads the generated APK as a build artifact, which can be downloaded and installed.
+
+This workflow ensures that a new build of the application is created with every update to the main branch.
+
 ## 📦 Building for Production
 
 ### Android APK
