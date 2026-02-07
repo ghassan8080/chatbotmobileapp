@@ -9,11 +9,14 @@ export const STRINGS = {
 
   // Navigation
   products: 'المنتجات',
+  myOrders: 'طلباتي',
+  orders: 'الطلبات',
   settings: 'الإعدادات',
 
   // Product List
   productList: 'قائمة المنتجات',
   addProduct: 'إضافة منتج',
+  viewOrders: 'عرض الطلبات',
   noProducts: 'لا توجد منتجات',
   loadingProducts: 'جاري تحميل المنتجات...',
   refresh: 'تحديث',
@@ -53,11 +56,14 @@ export const STRINGS = {
   edit: 'تعديل',
   delete: 'حذف',
   confirm: 'تأكيد',
+  confirmOrder: 'تثبيت الحجز',
+  confirmOrderMessage: 'هل أنت متأكد من تثبيت هذا الحجز؟',
   areYouSure: 'هل أنت متأكد؟',
   deleteProductConfirm: 'هل أنت متأكد من حذف هذا المنتج؟',
   deleteSuccess: 'تم حذف المنتج بنجاح',
   addSuccess: 'تم إضافة المنتج بنجاح',
   updateSuccess: 'تم تحديث المنتج بنجاح',
+  confirmSuccess: 'تم تثبيت الحجز بنجاح',
 
   // Error Messages
   error: 'خطأ',
@@ -65,7 +71,8 @@ export const STRINGS = {
   serverError: 'خطأ في الخادم',
   unknownError: 'حدث خطأ غير معروف',
   tryAgain: 'حاول مرة أخرى',
-
+loadingOrders: 'جاري تحميل الطلبات...',
+  
   // Loading
   loading: 'جاري التحميل...',
   processing: 'جاري المعالجة...',

@@ -12,6 +12,7 @@ import { I18nManager } from 'react-native';
 import ProductListScreen from '../screens/ProductListScreen';
 import ProductFormScreen from '../screens/ProductFormScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
+import OrdersListScreen from '../screens/OrdersListScreen';
 import LoginScreen from '../screens/LoginScreen';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
@@ -60,6 +61,10 @@ const AppNavigator = () => {
             <Stack.Screen 
               name={SCREEN_NAMES.PRODUCT_DETAIL} 
               component={ProductDetailScreen} 
+            />
+            <Stack.Screen 
+              name={SCREEN_NAMES.ORDERS_LIST} 
+              component={OrdersListScreen} 
             />
           </>
         )}

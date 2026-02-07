@@ -8,6 +8,7 @@ export const SCREEN_NAMES = {
   PRODUCT_LIST: 'ProductList',
   PRODUCT_FORM: 'ProductForm',
   PRODUCT_DETAIL: 'ProductDetail',
+  ORDERS_LIST: 'OrdersList',
   SETTINGS: 'Settings',
 };
 
