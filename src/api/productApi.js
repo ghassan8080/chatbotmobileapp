@@ -4,12 +4,7 @@
  */
 
 import apiClient from './apiClient';
-import { API_BASE_URL, API_ENDPOINTS, API_CONFIG } from '../config/apiConfig';
-
-// Force the correct endpoint for product fetching
-const CORRECT_GET_PRODUCTS_URL = 'https://n8n-n8n.17m6co.easypanel.host/webhook/Respond%20immediately';
-
-// ...existing code...
+import { API_ENDPOINTS, API_CONFIG } from '../config/apiConfig';
 
 /**
  * Get all products
@@ -17,9 +12,9 @@ const CORRECT_GET_PRODUCTS_URL = 'https://n8n-n8n.17m6co.easypanel.host/webhook/
  */
 export const getProducts = async () => {
   try {
-    // Use the correct deployed endpoint for GET_PRODUCTS
+    // Use centralized endpoint configuration
     const response = await apiClient.post(
-      CORRECT_GET_PRODUCTS_URL,
+      API_ENDPOINTS.GET_PRODUCTS,
       {},
       API_CONFIG
     );
@@ -48,7 +43,7 @@ export const addProduct = async (productData) => {
       images: productData.images || [],
     };
 
-    const response = await apiClient.post(API_BASE_URL, payload);
+    const response = await apiClient.post(API_ENDPOINTS.ADD_PRODUCT, payload);
     return response.data;
   } catch (error) {
     console.error('Error adding product:', error);
@@ -76,7 +71,7 @@ export const updateProduct = async (productData) => {
       images: productData.images || [],
     };
 
-    const response = await apiClient.post(API_BASE_URL, payload);
+    const response = await apiClient.post(API_ENDPOINTS.UPDATE_PRODUCT, payload);
     return response.data;
   } catch (error) {
     console.error('Error updating product:', error);
@@ -92,7 +87,7 @@ export const updateProduct = async (productData) => {
 export const deleteProduct = async (productId) => {
   try {
     const payload = { product_id: productId };
-    const response = await apiClient.post(API_BASE_URL, payload);
+    const response = await apiClient.post(API_ENDPOINTS.DELETE_PRODUCT, payload);
     return response.data;
   } catch (error) {
     console.error('Error deleting product:', error);
@@ -107,7 +102,7 @@ export const deleteProduct = async (productId) => {
  */
 export const getProductById = async (productId) => {
   try {
-    const response = await apiClient.get(`${API_BASE_URL}/${productId}`);
+    const response = await apiClient.get(`${API_ENDPOINTS.GET_PRODUCTS}/${productId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching product:', error);

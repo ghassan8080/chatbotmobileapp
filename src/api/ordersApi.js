@@ -5,9 +5,7 @@
 
 import apiClient from './apiClient';
 import { getUserId } from '../services/authService';
-
-// Orders endpoint
-const ORDERS_URL = 'https://n8n-n8n.17m6co.easypanel.host/webhook/orders';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 /**
  * Get all orders for the current user
@@ -23,7 +21,7 @@ export const getOrders = async () => {
     }
 
     // Build URL with user_id query parameter for multi-tenant filtering
-    const url = `${ORDERS_URL}?user_id=${userId}`;
+    const url = `${API_ENDPOINTS.ORDERS}?user_id=${userId}`;
     
     console.log('📥 Fetching orders with URL:', url);
     
@@ -69,7 +67,7 @@ export const getOrderById = async (orderId) => {
       throw new Error('User ID not found');
     }
 
-    const url = `${ORDERS_URL}/${orderId}?user_id=${userId}`;
+    const url = `${API_ENDPOINTS.ORDERS}/${orderId}?user_id=${userId}`;
     
     console.log('📥 Fetching order:', url);
     
@@ -95,8 +93,6 @@ export const updateOrderStatus = async (orderId, newStatus) => {
       throw new Error('User ID not found');
     }
 
-    const updateUrl = 'https://n8n-n8n.17m6co.easypanel.host/webhook/update-order-status';
-    
     const payload = {
       order_id: orderId,
       new_status: newStatus,
@@ -105,7 +101,8 @@ export const updateOrderStatus = async (orderId, newStatus) => {
 
     console.log('📤 Updating order status:', payload);
 
-    const response = await apiClient.post(updateUrl, payload);
+    // Use centralized endpoint configuration
+    const response = await apiClient.post(API_ENDPOINTS.UPDATE_ORDER_STATUS, payload);
 
     console.log('✅ Order status updated:', response.data);
 

@@ -3,33 +3,77 @@
     "name": "Product Management App",
     "slug": "product-management-app",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "auto",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.productmanagement.app"
+      "bundleIdentifier": "com.productmanagement.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app uses your photo library to select product images",
+        "NSCameraUsageDescription": "This app uses the camera to take product photos",
+        "NSPrivacyTracking": false,
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.productmanagement.app"
+      "package": "com.productmanagement.app",
+      "versionCode": 1,
+      "googleServicesFile": null,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.ACCESS_WIFI_STATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "android.intent.action.MAIN",
+          "category": [
+            "android.intent.category.LAUNCHER"
+          ]
+        }
+      ],
+      "usesCleartextTraffic": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
-      "expo-localization"
-    ]
+      [
+        "expo-localization",
+        {
+          "localizationPreferences": []
+        }
+      ]
+    ],
+    "extra": {
+      "projectId": ""
+    },
+    "description": "Product management application for sellers to manage their product inventory and orders",
+    "privacy": "https://example.com/privacy-policy",
+    "githubUrl": "https://github.com/ghassan8080/chatbotmobileapp"
   }
 }

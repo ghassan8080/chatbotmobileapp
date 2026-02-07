@@ -4,13 +4,13 @@
  */
 
 import axios from 'axios';
-import { API_ENDPOINTS } from '../config/apiConfig';
+import { API_ENDPOINTS, API_TIMEOUT } from '../config/apiConfig';
 
 // Login endpoint bypasses the regular apiClient to avoid token requirement
 export const loginRequest = async (credentials) => {
   try {
     const response = await axios.post(API_ENDPOINTS.LOGIN, credentials, {
-      timeout: 30000,
+      timeout: API_TIMEOUT,
       headers: {
         'Content-Type': 'application/json',
       },
