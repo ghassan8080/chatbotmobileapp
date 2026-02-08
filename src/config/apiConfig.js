@@ -13,10 +13,11 @@ import { Platform } from 'react-native';
 // Environment variable: EXPO_PUBLIC_API_BASE_URL
 // Always use the explicit API base URL from environment
 export const API_BASE_URL = 
-  process.env.EXPO_PUBLIC_API_BASE_URL || null;
+  process.env.EXPO_PUBLIC_API_BASE_URL || 'https://n8n-n8n.17m6co.easypanel.host/webhook';
 
 if (!API_BASE_URL) {
   console.warn('⚠️ WARNING: EXPO_PUBLIC_API_BASE_URL not configured. API calls will fail.');
+}
 
 // API Key (JWT Token)
 // Environment variable: EXPO_PUBLIC_API_KEY
@@ -36,7 +37,8 @@ export const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT || '3000
 // All endpoints are relative to API_BASE_URL for flexibility
 // Can be customized via environment variables if needed
 const LOGIN_ENDPOINT = process.env.EXPO_PUBLIC_LOGIN_ENDPOINT || '/login';
-const GET_PRODUCTS_ENDPOINT = process.env.EXPO_PUBLIC_GET_PRODUCTS_ENDPOINT || '/get-products';
+const LOGOUT_ENDPOINT = process.env.EXPO_PUBLIC_LOGOUT_ENDPOINT || '/logout';
+const GET_PRODUCTS_ENDPOINT = process.env.EXPO_PUBLIC_GET_PRODUCTS_ENDPOINT || '/products';
 const ADD_PRODUCT_ENDPOINT = process.env.EXPO_PUBLIC_ADD_PRODUCT_ENDPOINT || '/add-product';
 const UPDATE_PRODUCT_ENDPOINT = process.env.EXPO_PUBLIC_UPDATE_PRODUCT_ENDPOINT || '/update-product';
 const DELETE_PRODUCT_ENDPOINT = process.env.EXPO_PUBLIC_DELETE_PRODUCT_ENDPOINT || '/delete-product';
@@ -46,6 +48,7 @@ const UPDATE_ORDER_STATUS_ENDPOINT = process.env.EXPO_PUBLIC_UPDATE_ORDER_STATUS
 export const API_ENDPOINTS = {
   // Authentication endpoint - uses full URL because login happens before we have auth
   LOGIN: API_BASE_URL ? `${API_BASE_URL}${LOGIN_ENDPOINT}` : null,
+  LOGOUT: API_BASE_URL ? `${API_BASE_URL}${LOGOUT_ENDPOINT}` : null,
   
   // Product endpoints
   GET_PRODUCTS: API_BASE_URL ? `${API_BASE_URL}${GET_PRODUCTS_ENDPOINT}` : null,

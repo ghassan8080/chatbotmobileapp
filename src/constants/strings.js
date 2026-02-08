@@ -59,6 +59,7 @@ export const STRINGS = {
   confirmOrder: 'تثبيت الحجز',
   confirmOrderMessage: 'هل أنت متأكد من تثبيت هذا الحجز؟',
   areYouSure: 'هل أنت متأكد؟',
+  logoutConfirm: 'هل أنت متأكد من تسجيل الخروج؟',
   deleteProductConfirm: 'هل أنت متأكد من حذف هذا المنتج؟',
   deleteSuccess: 'تم حذف المنتج بنجاح',
   addSuccess: 'تم إضافة المنتج بنجاح',
@@ -99,4 +100,5 @@ loadingOrders: 'جاري تحميل الطلبات...',
   login: 'تسجيل الدخول',
   email: 'البريد الإلكتروني',
   password: 'كلمة المرور',
+  logout: 'تسجيل الخروج',
 };

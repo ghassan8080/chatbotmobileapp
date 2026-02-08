@@ -94,11 +94,22 @@ export const formatImageUrl = (url, width = 300, height = 300) => {
 export const formatProductForDisplay = (product) => {
   const images = [];
 
-  // Collect all image URLs
-  for (let i = 1; i <= 4; i++) {
-    const imageField = `image_url_${i}`;
-    if (product[imageField]) {
-      images.push(product[imageField]);
+  // Check if images array already exists and is valid
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    images.push(...product.images);
+  } 
+  // Check if single image property exists
+  else if (product.image) {
+    images.push(product.image);
+  }
+  // Fallback to checking individual image_url_x fields
+  else {
+    // Collect all image URLs from legacy fields
+    for (let i = 1; i <= 4; i++) {
+      const imageField = `image_url_${i}`;
+      if (product[imageField]) {
+        images.push(product[imageField]);
+      }
     }
   }
 

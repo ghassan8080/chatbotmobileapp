@@ -7,6 +7,8 @@ import React, { createContext, useState, useEffect } from 'react';
 import { storeUserToken, getUserToken, storeUserId, getUserId, clearAuthData } from '../services/authService';
 import { subscribeAuth } from '../services/authEvents';
 import { loginRequest } from '../api/authApi';
+import apiClient from '../api/apiClient';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 export const AuthContext = createContext({});
 
@@ -55,13 +57,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    console.log('Logout initiated in AuthContext');
     try {
+      // Call server-side logout webhook if available
+      if (API_ENDPOINTS.LOGOUT) {
+         console.log('Calling server logout:', API_ENDPOINTS.LOGOUT);
+         try {
+           await apiClient.post(API_ENDPOINTS.LOGOUT, {});
+           console.log('Server logout successful');
+         } catch (apiError) {
+           console.warn('Server logout failed, proceeding with local logout:', apiError);
+         }
+      }
+      
       await clearAuthData();
+      console.log('Local auth data cleared');
     } catch (e) {
       console.error('Error clearing auth during logout:', e);
     }
     setToken(null);
     setUser(null);
+    console.log('Auth state reset');
   };
 
   return (

@@ -17,6 +17,9 @@ export const useProducts = () => {
   /**
    * Fetch products from API or cache
    */
+  /**
+   * Fetch products from API or cache
+   */
   const fetchProducts = useCallback(async (useCache = true) => {
     try {
       setLoading(true);
@@ -26,10 +29,25 @@ export const useProducts = () => {
 
       try {
         // Try to fetch from API
-        fetchedProducts = await getProducts();
+        const responseData = await getProducts();
+        console.log('Products API Raw Response:', JSON.stringify(responseData));
+
+        // Handle different response formats
+        if (Array.isArray(responseData)) {
+            fetchedProducts = responseData;
+        } else if (responseData && Array.isArray(responseData.products)) {
+            fetchedProducts = responseData.products;
+        } else if (responseData && Array.isArray(responseData.data)) {
+            fetchedProducts = responseData.data;
+        } else {
+            console.warn('Unexpected products response format:', responseData);
+            fetchedProducts = [];
+        }
 
         // Store in cache
-        await storeProductsCache(fetchedProducts);
+        if (fetchedProducts.length > 0) {
+            await storeProductsCache(fetchedProducts);
+        }
       } catch (apiError) {
         console.error('Error fetching products from API:', apiError);
 
@@ -40,7 +58,7 @@ export const useProducts = () => {
             console.log('Using cached products');
             fetchedProducts = cachedProducts;
           } else {
-            throw apiError;
+            throw apiError; // Throw original error if no cache
           }
         } else {
           throw apiError;

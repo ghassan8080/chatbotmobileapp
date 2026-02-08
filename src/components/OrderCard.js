@@ -186,118 +186,129 @@ const OrderCard = ({ order, onPress, onConfirmOrder }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.cardBackground,
-    marginVertical: 8,
+    marginVertical: 10,
     marginHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
-    elevation: 3,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
-    position: 'relative',
+    elevation: 4,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    borderRightWidth: 6, // Changed to Right for RTL visual flow
+    borderRightColor: COLORS.primary,
   },
   statusBadge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
+    top: 12,
+    left: 12, // Moved to LEFT to avoid overlap with Arabic text on right
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 0,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    zIndex: 10,
   },
   statusText: {
     color: COLORS.white,
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingTop: 32,
-    paddingBottom: 12,
+    padding: 16,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray[100],
+    marginTop: 8,
+    alignItems: 'flex-end', // Align header content to right
   },
   orderId: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '800',
     color: COLORS.text.primary,
-    flex: 1,
+    textAlign: 'right',
   },
   date: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.text.secondary,
+    marginTop: 4,
+    textAlign: 'right',
   },
   section: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray[100],
   },
   sectionRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse', // Reverse for RTL: Icon/Label on Right
     alignItems: 'center',
     marginBottom: 8,
+    justifyContent: 'flex-start', // Start from right (because row-reverse)
   },
   addressRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse', // Reverse for RTL
     alignItems: 'flex-start',
-    marginBottom: 0,
   },
   label: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.text.secondary,
-    marginLeft: 8,
-    minWidth: 85,
-    width: 85,
+    marginRight: 8, // Changed marginLeft to marginRight
+    marginLeft: 0,
+    width: 100,
+    textAlign: 'right', // Align text right
   },
   value: {
-    fontSize: 13,
+    fontSize: 15,
     color: COLORS.text.primary,
     flex: 1,
-    fontWeight: '500',
+    fontWeight: '600',
+    textAlign: 'right', // Align text right
   },
   addressValue: {
-    fontSize: 12,
+    fontSize: 14,
     color: COLORS.text.primary,
     flex: 1,
-    fontWeight: '500',
+    lineHeight: 20,
+    textAlign: 'right', // Align text right
   },
   actionSection: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    padding: 16,
     backgroundColor: COLORS.gray[50],
-    borderTopWidth: 1,
-    borderTopColor: COLORS.gray[100],
   },
   confirmButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse', // Icon on right, text on left (or vice versa depending on pref)
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    backgroundColor: COLORS.success,
+    paddingVertical: 14,
+    borderRadius: 12,
     elevation: 2,
+    shadowColor: COLORS.success,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   confirmButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
+    backgroundColor: COLORS.gray[400],
   },
   confirmButtonText: {
     color: COLORS.white,
-    fontWeight: '600',
-    fontSize: 14,
-    marginLeft: 8,
+    fontWeight: '700',
+    fontSize: 16,
+    marginRight: 8, // Adjusted spacing
   },
   buttonIcon: {
-    marginRight: 4,
+    marginLeft: 4, // Adjusted spacing
   },
   arrow: {
     position: 'absolute',
-    bottom: 12,
-    right: 12,
-    opacity: 0.5,
+    bottom: 16,
+    left: 16, // Moved arrow to left
+    opacity: 0.3,
+    transform: [{ rotate: '180deg' }], // E.g. point left
   },
 });
 

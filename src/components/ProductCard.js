@@ -14,10 +14,12 @@ const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
   const hasImages = images.length > 0;
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.header}>
-        <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
-        <Text style={styles.price}>{product.price}</Text>
+        <View style={styles.titleContainer}>
+            <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+        </View>
+        <Text style={styles.price}>{product.price} <Text style={styles.currency}>د.ع</Text></Text>
       </View>
 
       <Text style={styles.description} numberOfLines={3}>
@@ -25,23 +27,29 @@ const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
       </Text>
 
       {hasImages && (
-        <ScrollView horizontal style={styles.imageContainer} showsHorizontalScrollIndicator={false}>
-          {images.map((imageUrl, index) => (
-            <Image
-              key={index}
-              source={{ uri: imageUrl }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-          ))}
-        </ScrollView>
+        <View style={styles.imageSection}>
+            <ScrollView horizontal style={styles.imageContainer} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.imageScrollContent}>
+            {images.map((imageUrl, index) => (
+                <View key={index} style={styles.imageWrapper}>
+                    <Image
+                    source={{ uri: imageUrl }}
+                    style={styles.image}
+                    resizeMode="cover"
+                    />
+                </View>
+            ))}
+            </ScrollView>
+        </View>
       )}
+
+      <View style={styles.divider} />
 
       <View style={styles.actions}>
         <TouchableOpacity 
           style={[styles.actionButton, styles.editButton]} 
           onPress={() => onEdit && onEdit(product)}
         >
+          <Text style={styles.buttonEmoji}>✏️</Text>
           <Text style={styles.editButtonText}>{STRINGS.edit}</Text>
         </TouchableOpacity>
 
@@ -49,6 +57,7 @@ const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
           style={[styles.actionButton, styles.deleteButton]} 
           onPress={() => onDelete && onDelete(product)}
         >
+          <Text style={styles.buttonEmoji}>🗑️</Text>
           <Text style={styles.deleteButtonText}>{STRINGS.delete}</Text>
         </TouchableOpacity>
       </View>
@@ -59,128 +68,125 @@ const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.cardBackground,
-    marginVertical: 8,
+    marginVertical: 10,
     marginHorizontal: 16,
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
     elevation: 4,
-  },
-  cardContent: {
-    padding: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.gray[200],
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse', // RTL: Name Right, Price Left
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    padding: 16,
+    paddingBottom: 8,
   },
   titleContainer: {
     flex: 1,
-    marginRight: 12,
+    marginLeft: 12,
   },
   name: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: COLORS.text.primary,
-    marginBottom: 4,
-    lineHeight: 24,
+    textAlign: 'right', // RTL
+    lineHeight: 26,
+  },
+  price: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: COLORS.primary,
+    textAlign: 'left', // LTR for numbers
+  },
+  currency: {
+    fontSize: 14,
+    color: COLORS.text.secondary,
+    fontWeight: '600',
   },
   description: {
     fontSize: 14,
     color: COLORS.text.secondary,
-    lineHeight: 20,
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-    minWidth: 80,
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.primary,
-    lineHeight: 28,
-  },
-  currencyLabel: {
-    fontSize: 12,
-    color: COLORS.text.tertiary,
-    marginTop: 2,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    lineHeight: 22,
+    textAlign: 'right', // RTL
   },
   imageSection: {
     marginBottom: 12,
-    position: 'relative',
   },
   imageContainer: {
-    borderRadius: 12,
-    overflow: 'hidden',
+    flexDirection: 'row-reverse',
   },
   imageScrollContent: {
-    paddingHorizontal: 4,
+    paddingHorizontal: 16,
+    flexDirection: 'row-reverse',
   },
   imageWrapper: {
-    marginRight: 8,
+    marginLeft: 12,
     borderRadius: 12,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORS.gray[200],
   },
   image: {
     width: 100,
     height: 100,
-    borderRadius: 12,
-  },
-  imageIndicator: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  imageIndicatorText: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: '600',
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.borderLight,
-    marginVertical: 12,
+    backgroundColor: COLORS.gray[100],
+    marginHorizontal: 16,
+    marginBottom: 8,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    gap: 8,
+    flexDirection: 'row-reverse', // Buttons flow from Right
+    padding: 12,
+    paddingTop: 0,
+    gap: 12,
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'row', // Icon next to text
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 12,
+    elevation: 1, // Slight 3D pop
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   editButton: {
-    backgroundColor: COLORS.warning + '15',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.warning,
+    borderColor: COLORS.primaryLight,
   },
   editButtonText: {
-    color: COLORS.warning,
-    fontWeight: '600',
+    color: COLORS.primary,
+    fontWeight: '700',
     fontSize: 14,
+    marginLeft: 8,
   },
   deleteButton: {
-    backgroundColor: COLORS.error + '15',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.error,
+    borderColor: COLORS.red,
   },
   deleteButtonText: {
-    color: COLORS.error,
-    fontWeight: '600',
+    color: COLORS.red,
+    fontWeight: '700',
     fontSize: 14,
+    marginLeft: 8,
+  },
+  buttonEmoji: {
+    fontSize: 16,
   },
 });
-
 export default ProductCard;

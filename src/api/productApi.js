@@ -6,17 +6,23 @@
 import apiClient from './apiClient';
 import { API_ENDPOINTS, API_CONFIG } from '../config/apiConfig';
 
+import { getUserId } from '../services/authService';
+
 /**
  * Get all products
  * @returns {Promise<Array>} Array of products
  */
 export const getProducts = async () => {
   try {
+    const userId = await getUserId();
+    
     // Use centralized endpoint configuration
-    const response = await apiClient.post(
+    const response = await apiClient.get(
       API_ENDPOINTS.GET_PRODUCTS,
-      {},
-      API_CONFIG
+      {
+        ...API_CONFIG,
+        params: { user_id: userId }
+      }
     );
     return response.data;
   } catch (error) {

@@ -58,8 +58,7 @@
       "usesCleartextTraffic": false
     },
     "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [

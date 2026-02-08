@@ -5,65 +5,69 @@
 
 // Primary Colors
 export const COLORS = {
-  // Main brand colors
-  primary: '#4CAF50',
-  primaryDark: '#45a049',
-  primaryLight: '#81C784',
+  // Modern Vibrant Palette
+  primary: '#6200EA', // Deep Purple
+  primaryDark: '#3700B3',
+  primaryLight: '#B388FF',
 
-  // Secondary colors
-  secondary: '#FF9800',
-  secondaryDark: '#F57C00',
-  secondaryLight: '#FFB74D',
+  // Secondary
+  secondary: '#FFAB00', // Vibrant Amber
+  secondaryDark: '#FF6D00',
+  secondaryLight: '#FFD180',
 
-  // Status colors
-  success: '#4CAF50',
-  warning: '#FFC107',
-  error: '#F44336',
-  info: '#2196F3',
+  // UI Colors
+  background: '#F5F6FA', // Very light blue-gray
+  cardBackground: '#FFFFFF',
+  
+  // Text
+  text: {
+    primary: '#1A237E', // Dark Blue for text
+    secondary: '#757575',
+    disabled: '#BDBDBD',
+    inverse: '#FFFFFF',
+    highlight: '#6200EA',
+  },
 
-  // Neutral colors
+  // Status & Categories (Matching the reference image)
+  purple: '#6200EA',
+  red: '#D50000',
+  blue: '#2962FF',
+  green: '#00C853',
+  orange: '#FF6D00',
+  teal: '#00BFA5',
+  
+  // Functional
+  success: '#00C853',
+  warning: '#FFAB00',
+  error: '#D50000',
+  info: '#2962FF',
+
+  // Neutrals
   white: '#FFFFFF',
   black: '#000000',
   gray: {
-    50: '#F9FAFB',
-    100: '#F3F4F6',
-    200: '#E5E7EB',
-    300: '#D1D5DB',
-    400: '#9CA3AF',
-    500: '#6B7280',
-    600: '#4B5563',
-    700: '#374151',
-    800: '#1F2937',
-    900: '#111827',
+    50: '#FAFAFA',
+    100: '#F5F5F5',
+    200: '#EEEEEE',
+    300: '#E0E0E0',
+    400: '#BDBDBD',
+    500: '#9E9E9E',
+    600: '#757575',
+    700: '#616161',
+    800: '#424242',
+    900: '#212121',
   },
 
-  // Background colors
-  background: '#F9F9F9',
-  cardBackground: '#FFFFFF',
-
-  // Text colors
-  text: {
-    primary: '#333333',
-    secondary: '#666666',
-    disabled: '#999999',
-    inverse: '#FFFFFF',
-  },
-
-  // Border colors
-  border: '#DDDDDD',
-
-  // Shadow colors
-  shadow: 'rgba(0, 0, 0, 0.1)',
-
-  // Overlay colors
-  overlay: 'rgba(0, 0, 0, 0.5)',
-
-  // Input colors
+  // Input
   input: {
     background: '#FFFFFF',
-    border: '#DDDDDD',
-    placeholder: '#999999',
+    border: '#E0E0E0',
+    placeholder: '#9E9E9E',
+    focus: '#6200EA',
   },
+  
+  // Shadows
+  shadow: 'rgba(98, 0, 234, 0.15)', // Purple-tinted shadow
 };
 
 // Color utilities
