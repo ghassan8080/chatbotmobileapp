@@ -46,24 +46,53 @@ const ProductListScreen = ({ navigation }) => {
   };
 
   const handleDelete = (product) => {
-    Alert.alert(
-      STRINGS.deleteConfirm || 'Delete Product',
-      STRINGS.deleteMessage || 'Are you sure you want to delete this product?',
-      [
-        { text: STRINGS.cancel, style: 'cancel' },
-        {
-          text: STRINGS.delete || 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeProduct(product.id || product.product_id || product._id);
-            } catch (error) {
-              Alert.alert(STRINGS.error || 'Error', error.message);
-            }
-          },
-        },
-      ]
-    );
+    console.log('🔴 DELETE ACTION TRIGGERED', product);
+    const productId = product.id || product.product_id || product._id;
+    console.log('🔴 Target Product ID:', productId);
+
+    if (!productId) {
+      console.error('❌ Error: No valid product ID found to delete');
+      Alert.alert('Error', 'Cannot delete product: Invalid ID');
+      return;
+    }
+
+    const performDelete = async () => {
+      console.log('🔴 CONFIRMED: Proceeding with delete for ID:', productId);
+      try {
+        await removeProduct(productId);
+        console.log('✅ Delete operation completed successfully');
+      } catch (error) {
+        console.error('❌ Delete operation failed:', error);
+        Alert.alert(STRINGS.error || 'Error', error.message);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+        // Use browser native confirm for Web
+        if (window.confirm(STRINGS.deleteMessage || 'Are you sure you want to delete this product?')) {
+            performDelete();
+        } else {
+            console.log('⚪ Delete cancelled by user (Web)');
+        }
+    } else {
+        // Use React Native Alert for Mobile
+        Alert.alert(
+            STRINGS.deleteConfirm || 'Delete Product',
+            STRINGS.deleteMessage || 'Are you sure you want to delete this product?',
+            [
+                { 
+                    text: STRINGS.cancel, 
+                    style: 'cancel',
+                    onPress: () => console.log('⚪ Delete cancelled by user (Mobile)')
+                },
+                {
+                    text: STRINGS.delete || 'Delete',
+                    style: 'destructive',
+                    onPress: performDelete,
+                },
+            ]
+        );
+    }
   };
 
   const renderItem = ({ item }) => (

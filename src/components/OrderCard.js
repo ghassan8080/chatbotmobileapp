@@ -59,37 +59,38 @@ const OrderCard = ({ order, onPress, onConfirmOrder }) => {
   // Check if order is pending
   const isPending = status?.toLowerCase() === 'pending' || status?.toLowerCase() === 'قيد الانتظار';
 
-  // Handle confirm order
-  const handleConfirmOrder = () => {
-    Alert.alert(
-      STRINGS.confirmOrder,
-      STRINGS.confirmOrderMessage,
-      [
-        {
-          text: STRINGS.cancel,
-          onPress: () => console.log('Cancelled'),
-          style: 'cancel',
-        },
-        {
-          text: STRINGS.confirm,
-          onPress: async () => {
-            setIsConfirming(true);
-            try {
-              if (onConfirmOrder) {
-                await onConfirmOrder(orderId, 'confirmed');
-              }
-            } catch (error) {
-              console.error('Error confirming order:', error);
-              Alert.alert(STRINGS.error, error.message || STRINGS.operationFailed);
-            } finally {
-              setIsConfirming(false);
-            }
-          },
-          style: 'default',
-        },
-      ],
-      { cancelable: false }
-    );
+  // Handle confirm order - using window.confirm for web compatibility
+  const handleConfirmOrder = async () => {
+    console.log('🔵 CONFIRM BUTTON CLICKED - Order ID:', orderId);
+    console.log('🔵 onConfirmOrder function exists?', !!onConfirmOrder);
+    
+    // Use window.confirm for web instead of Alert.alert
+    const confirmed = window.confirm('هل تريد تثبيت هذا الحجز؟');
+    
+    if (!confirmed) {
+      console.log('🔵 User cancelled confirmation');
+      return;
+    }
+    
+    console.log('🔵 User confirmed, starting confirmation process...');
+    setIsConfirming(true);
+    
+    try {
+      if (onConfirmOrder) {
+        console.log('🔵 Calling parent onConfirmOrder function...');
+        await onConfirmOrder(orderId, 'confirmed');
+        console.log('✅ onConfirmOrder completed successfully');
+        alert('تم تثبيت الحجز بنجاح!');
+      } else {
+        console.error('🔴 onConfirmOrder is not defined!');
+        alert('خطأ: دالة التثبيت غير موجودة');
+      }
+    } catch (error) {
+      console.error('🔴 Error in handleConfirmOrder:', error);
+      alert('خطأ: ' + (error.message || 'فشل تثبيت الحجز'));
+    } finally {
+      setIsConfirming(false);
+    }
   };
 
   return (

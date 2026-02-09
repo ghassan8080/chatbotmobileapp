@@ -59,6 +59,9 @@ export const API_ENDPOINTS = {
   // Order endpoints
   ORDERS: API_BASE_URL ? `${API_BASE_URL}${ORDERS_ENDPOINT}` : null,
   UPDATE_ORDER_STATUS: API_BASE_URL ? `${API_BASE_URL}${UPDATE_ORDER_STATUS_ENDPOINT}` : null,
+  
+  // Webhooks
+  CONFIRM_BOOKING_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/confirm-booking',
 };
 
 // API Request Configuration

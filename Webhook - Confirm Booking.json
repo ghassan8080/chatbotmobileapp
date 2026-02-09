@@ -1,0 +1,376 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "confirm-booking",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "179a42e3-6d74-45b5-8fc7-23052c734518",
+      "name": "Webhook - Confirm Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2256,
+        4720
+      ],
+      "webhookId": "53bfcf79-46ff-4e67-81de-79fb12027173"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enhanced validation\nconst body = $input.first().json.body || $input.first().json;\n\n// Required fields\nconst requiredFields = ['order_id', 'user_id'];\nconst missingFields = requiredFields.filter(field => !body[field]);\n\nif (missingFields.length > 0) {\n  return [{\n    json: {\n      valid: false,\n      error: `Missing required fields: ${missingFields.join(', ')}`\n    }\n  }];\n}\n\n// Validate order_id format (if it should be numeric or UUID)\nif (!body.order_id || body.order_id.toString().trim() === '') {\n  return [{\n    json: {\n      valid: false,\n      error: \"Invalid order_id format\"\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    order_id: body.order_id,\n    user_id: body.user_id,\n    status: body.status || 'confirmed'\n  }\n}];"
+      },
+      "id": "a5f2be7b-7812-4ae3-a631-5ab6b49b2555",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2064,
+        4720
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{$json.id}}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ff7dc70f-d7b8-49a6-a0a7-abdf91bfde1b",
+      "name": "Check Order Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        4720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    message: 'تم تثبيت الحجز بنجاح',\n    order_id: $json.id,\n    order_details: {\n      product: $json.selectedProduct,\n      phone: $json.phone,\n      address: $json.address,\n      confirmed_at: $('Validate Data').item.json.confirmed_at\n    }\n  }\n}];"
+      },
+      "id": "24bf6b71-7aab-4028-bb12-b7b31ed4f592",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1072,
+        4720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error: 'الطلب غير موجود',\n    message: 'لم يتم العثور على الطلب المطلوب'\n  }\n}];"
+      },
+      "id": "ab6cbe02-9d6a-45f3-8bff-96452574051f",
+      "name": "Error Response - Not Found",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1328,
+        4832
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {}
+      },
+      "id": "28870bc1-d020-41be-8577-15722d2ca18e",
+      "name": "Respond to Webhook4",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        4720
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "E8PgZVlXhivmAqzf",
+          "mode": "list",
+          "cachedResultName": "orders",
+          "cachedResultUrl": "/projects/Gh79LIqq97SfPCAc/datatables/E8PgZVlXhivmAqzf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.query.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1904,
+        4720
+      ],
+      "id": "a3ee9335-ebd7-4ebb-80e9-1b236f09a07d",
+      "name": "Get Order Details"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "E8PgZVlXhivmAqzf",
+          "mode": "list",
+          "cachedResultName": "orders",
+          "cachedResultUrl": "/projects/Gh79LIqq97SfPCAc/datatables/E8PgZVlXhivmAqzf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.query.user_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone": 0
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "senderId",
+              "displayName": "senderId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "page_id",
+              "displayName": "page_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "selectedProduct",
+              "displayName": "selectedProduct",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        4608
+      ],
+      "id": "db97f0ba-49a1-4af5-bb1b-374c710d990d",
+      "name": "Update Order Status"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node Name: \"Verify User Ownership\"\nconst order = $input.first().json;\nconst requestUserId = $('Validate Data').first().json.user_id;\n\nif (order.user_id !== requestUserId) {\n  return [{\n    json: {\n      authorized: false,\n      error: \"Unauthorized: Order belongs to different user\"\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    authorized: true,\n    order: order\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1728,
+        4720
+      ],
+      "id": "fe6b0503-bf1d-4883-a533-02f3493d7b58",
+      "name": "User Authorization Check"
+    }
+  ],
+  "connections": {
+    "Webhook - Confirm Booking": {
+      "main": [
+        [
+          {
+            "node": "Validate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Data": {
+      "main": [
+        [
+          {
+            "node": "Get Order Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Order Exists": {
+      "main": [
+        [
+          {
+            "node": "Update Order Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response - Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Response - Not Found": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order Details": {
+      "main": [
+        [
+          {
+            "node": "User Authorization Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Order Status": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Authorization Check": {
+      "main": [
+        [
+          {
+            "node": "Check Order Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fc34f0d09f29f5af7bd7968d78f75f1e07aa651f09bb42b8701cd9f168a4c83"
+  }
+}

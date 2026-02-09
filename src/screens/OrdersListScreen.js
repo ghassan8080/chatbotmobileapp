@@ -11,7 +11,7 @@ import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import OrderCard from '../components/OrderCard';
 import { useOrders } from '../hooks/useOrders';
-import { updateOrderStatus } from '../api/ordersApi';
+import { updateOrderStatus, confirmBooking } from '../api/ordersApi';
 import { AuthContext } from '../context/AuthContext';
 
 const OrdersListScreen = ({ navigation }) => {
@@ -42,16 +42,17 @@ const OrdersListScreen = ({ navigation }) => {
 
   /**
    * Handle order confirmation
-   * Updates order status to "confirmed"
+   * Calls the webhook to confirm the booking
    */
   const handleConfirmOrder = async (orderId, newStatus) => {
     try {
-      console.log(`📤 Confirming order ${orderId} to status: ${newStatus}`);
+      console.log(`📤 Confirming order ${orderId} via webhook`);
       setConfirmingOrderId(orderId);
 
-      const result = await updateOrderStatus(orderId, newStatus);
+      // Call the webhook to confirm booking
+      const result = await confirmBooking(orderId);
 
-      console.log('✅ Order confirmed:', result);
+      console.log('✅ Order confirmed via webhook:', result);
 
       // Show success message
       Alert.alert(STRINGS.success, STRINGS.confirmSuccess);
@@ -60,6 +61,7 @@ const OrdersListScreen = ({ navigation }) => {
       await fetchOrders();
     } catch (err) {
       console.error('❌ Error confirming order:', err);
+      Alert.alert('خطأ', err.message || 'فشل تثبيت الحجز');
       throw err;
     } finally {
       setConfirmingOrderId(null);

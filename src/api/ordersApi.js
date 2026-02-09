@@ -112,3 +112,47 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     throw new Error(error.message || 'Failed to update order status');
   }
 };
+
+/**
+ * Confirm a booking via webhook
+ * @param {string} orderId - Order ID to confirm
+ * @returns {Promise<Object>} Response from webhook
+ */
+export const confirmBooking = async (orderId) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const payload = {
+      order_id: orderId,
+      user_id: userId,
+      status: 'confirmed',
+    };
+
+    console.log('📤 Confirming booking via webhook:', payload);
+
+    const response = await fetch(API_ENDPOINTS.CONFIRM_BOOKING_WEBHOOK, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook failed: ${response.statusText}`);
+    }
+    
+    // Check if response has content before parsing JSON
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : { success: true };
+    
+    console.log('✅ Booking confirmed via webhook:', data);
+    return data;
+  } catch (error) {
+    console.error('Error confirming booking:', error);
+    throw new Error(error.message || 'Failed to confirm booking');
+  }
+};
