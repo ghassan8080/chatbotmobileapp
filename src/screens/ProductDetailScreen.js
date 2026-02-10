@@ -10,13 +10,17 @@ import {
   StyleSheet, 
   ScrollView, 
   Image, 
-  TouchableOpacity, 
-  Alert 
+  Alert,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useProducts } from '../hooks/useProducts';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
+import ScreenHeader from '../components/ScreenHeader';
+import AppButton from '../components/AppButton';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { product } = route.params;
@@ -64,48 +68,99 @@ const ProductDetailScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <ScreenHeader
+        title={STRINGS.productDetails}
+        backgroundColor={COLORS.primary}
+        leftAction={{
+          icon: 'arrow-forward',
+          onPress: () => navigation.goBack(),
+        }}
+      />
+
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Image Gallery */}
         {images.length > 0 ? (
-          <ScrollView horizontal pagingEnabled style={styles.imageContainer}>
-            {images.map((imageUrl, index) => (
-              <Image
-                key={index}
-                source={{ uri: imageUrl }}
-                style={styles.image}
-                resizeMode="contain"
-              />
-            ))}
-          </ScrollView>
+          <View>
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              style={styles.imageContainer}
+            >
+              {images.map((imageUrl, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: imageUrl }}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              ))}
+            </ScrollView>
+            {/* Pagination Dots */}
+            {images.length > 1 && (
+              <View style={styles.dotsContainer}>
+                {images.map((_, index) => (
+                  <View
+                    key={index}
+                    style={[styles.dot, index === 0 && styles.dotActive]}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
         ) : (
           <View style={styles.noImageContainer}>
-            <Ionicons name="image-outline" size={80} color={COLORS.gray[400]} />
+            <View style={styles.noImageIconWrapper}>
+              <Ionicons name="image-outline" size={72} color={COLORS.gray[300]} />
+            </View>
             <Text style={styles.noImageText}>{STRINGS.noImages}</Text>
           </View>
         )}
 
+        {/* Content Card */}
         <View style={styles.contentContainer}>
           <Text style={styles.name}>{product.name}</Text>
 
+          {/* Price Badge */}
           <View style={styles.priceContainer}>
-            <Text style={styles.priceLabel}>{STRINGS.price}</Text>
-            <Text style={styles.price}>{product.price}</Text>
+            <View style={styles.priceIconContainer}>
+              <Ionicons name="pricetag" size={18} color={COLORS.primary} />
+            </View>
+            <View style={styles.priceTextContainer}>
+              <Text style={styles.priceLabel}>{STRINGS.price}</Text>
+              <Text style={styles.price}>{product.price} <Text style={styles.currency}>د.ع</Text></Text>
+            </View>
           </View>
 
+          {/* Description Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{STRINGS.description}</Text>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="document-text-outline" size={18} color={COLORS.primary} style={styles.sectionIcon} />
+              <Text style={styles.sectionTitle}>{STRINGS.description}</Text>
+            </View>
             <Text style={styles.description}>{product.description}</Text>
           </View>
 
+          {/* Action Buttons */}
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleEdit}>
-              <Ionicons name="create-outline" size={24} color={COLORS.warning} />
-              <Text style={styles.actionButtonText}>{STRINGS.edit}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={24} color={COLORS.error} />
-              <Text style={styles.actionButtonText}>{STRINGS.delete}</Text>
-            </TouchableOpacity>
+            <View style={styles.actionButtonWrapper}>
+              <AppButton
+                title={STRINGS.edit}
+                onPress={handleEdit}
+                variant="ghost"
+                icon="create-outline"
+                size="medium"
+              />
+            </View>
+            <View style={styles.actionButtonWrapper}>
+              <AppButton
+                title={STRINGS.delete}
+                onPress={handleDelete}
+                variant="danger"
+                icon="trash-outline"
+                size="medium"
+              />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -122,32 +177,56 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imageContainer: {
-    height: 350,
+    height: 320,
     backgroundColor: COLORS.white,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    marginBottom: 20,
   },
   image: {
-    width: '100%',
-    height: 350,
+    width: SCREEN_WIDTH,
+    height: 320,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 12,
+    backgroundColor: COLORS.white,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.gray[300],
+    marginHorizontal: 4,
+  },
+  dotActive: {
+    backgroundColor: COLORS.primary,
+    width: 24,
+    borderRadius: 4,
   },
   noImageContainer: {
-    height: 350,
+    height: 280,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.gray[50],
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    marginBottom: 20,
+    marginBottom: 8,
+  },
+  noImageIconWrapper: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   noImageText: {
     fontSize: 16,
     color: COLORS.text.secondary,
-    marginTop: 12,
     fontWeight: '500',
   },
   contentContainer: {
@@ -155,85 +234,93 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: -20,
-    paddingTop: 32,
+    marginTop: -16,
+    paddingTop: 28,
+    elevation: 4,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
+    minHeight: 300,
   },
   name: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 26,
+    fontWeight: '800',
     color: COLORS.text.primary,
     marginBottom: 16,
-    lineHeight: 36,
+    lineHeight: 34,
     letterSpacing: -0.5,
   },
   priceContainer: {
     marginBottom: 24,
-    backgroundColor: COLORS.primary + '10',
+    backgroundColor: COLORS.primary + '08',
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: COLORS.primary + '15',
+  },
+  priceIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: COLORS.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  priceTextContainer: {
+    flex: 1,
+  },
+  priceLabel: {
+    fontSize: 12,
+    color: COLORS.text.secondary,
+    fontWeight: '500',
+    marginBottom: 2,
   },
   price: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 26,
+    fontWeight: '800',
     color: COLORS.primary,
     letterSpacing: -0.5,
   },
-  priceLabel: {
+  currency: {
     fontSize: 14,
     color: COLORS.text.secondary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionIcon: {
+    marginRight: 8,
+  },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.text.primary,
-    marginBottom: 12,
     letterSpacing: -0.3,
   },
   description: {
     fontSize: 16,
     color: COLORS.text.secondary,
     lineHeight: 26,
+    paddingLeft: 26,
   },
   actions: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 16,
+    marginTop: 8,
   },
-  actionButton: {
+  actionButtonWrapper: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    backgroundColor: COLORS.white,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    gap: 8,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  actionButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    letterSpacing: 0.2,
   },
 });
 

@@ -4,9 +4,10 @@
  */
 
 import React, { useContext, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ScreenHeader from '../components/ScreenHeader';
+import EmptyState from '../components/EmptyState';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import OrderCard from '../components/OrderCard';
@@ -22,7 +23,6 @@ const OrdersListScreen = ({ navigation }) => {
   const handleLogout = async () => {
     console.log('🔴 LOGOUT BUTTON CLICKED - Showing confirmation dialog');
     
-    // Simple confirmation
     const confirmed = window.confirm('هل تريد تسجيل الخروج؟');
     
     if (confirmed) {
@@ -49,15 +49,12 @@ const OrdersListScreen = ({ navigation }) => {
       console.log(`📤 Confirming order ${orderId} via webhook`);
       setConfirmingOrderId(orderId);
 
-      // Call the webhook to confirm booking
       const result = await confirmBooking(orderId);
 
       console.log('✅ Order confirmed via webhook:', result);
 
-      // Show success message
       Alert.alert(STRINGS.success, STRINGS.confirmSuccess);
 
-      // Refresh the orders list to get updated data
       await fetchOrders();
     } catch (err) {
       console.error('❌ Error confirming order:', err);
@@ -72,59 +69,48 @@ const OrdersListScreen = ({ navigation }) => {
     <OrderCard
       order={item}
       onPress={() => {
-        // Could navigate to order detail screen in the future
         console.log('Order tapped:', item);
       }}
       onConfirmOrder={handleConfirmOrder}
     />
   );
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons name="receipt" size={60} color={COLORS.gray[300]} />
-      <Text style={styles.emptyText}>لا توجد طلبات</Text>
-      <Text style={styles.emptySubtext}>
-        قم بإنشاء طلب جديد من خلال إضافة منتج
-      </Text>
-    </View>
-  );
-
-  const renderErrorState = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons name="alert-circle" size={60} color={COLORS.error} />
-      <Text style={styles.emptyText}>حدث خطأ</Text>
-      <Text style={styles.emptySubtext}>{error}</Text>
-      <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
-        <Text style={styles.retryButtonText}>حاول مجددا</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      {/* Header with logout and back buttons */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-forward" size={24} color={COLORS.white} />
-        </TouchableOpacity>
+      {/* Header */}
+      <ScreenHeader
+        title={STRINGS.myOrders}
+        backgroundColor={COLORS.secondary}
+        leftAction={{
+          icon: 'arrow-forward',
+          onPress: () => navigation.goBack(),
+        }}
+        rightAction={{
+          icon: 'log-out-outline',
+          label: STRINGS.logout,
+          onPress: handleLogout,
+        }}
+      />
 
-        <Text style={styles.headerTitle}>{STRINGS.myOrders}</Text>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>{STRINGS.logout}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Loading state */}
+      {/* Content */}
       {loading && !refreshing ? (
         <LoadingSpinner text={STRINGS.loadingOrders} />
       ) : error && orders.length === 0 ? (
-        renderErrorState()
+        <EmptyState
+          icon="alert-circle-outline"
+          iconColor={COLORS.error}
+          title="حدث خطأ"
+          subtitle={error}
+          actionLabel="حاول مجددا"
+          actionIcon="refresh-outline"
+          onAction={onRefresh}
+        />
       ) : orders.length === 0 ? (
-        renderEmptyState()
+        <EmptyState
+          icon="receipt-outline"
+          title="لا توجد طلبات"
+          subtitle="قم بإنشاء طلب جديد من خلال إضافة منتج"
+        />
       ) : (
         <FlatList
           data={orders}
@@ -132,7 +118,7 @@ const OrdersListScreen = ({ navigation }) => {
           renderItem={renderItem}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          contentContainerStyle={{ paddingVertical: 8 }}
+          contentContainerStyle={styles.listContent}
         />
       )}
     </View>
@@ -144,75 +130,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: COLORS.secondary, // Use secondary for orders screen distinction
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    paddingTop: 60,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    elevation: 6,
-    shadowColor: COLORS.secondary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    marginBottom: 10,
-  },
-  backButton: {
-    padding: 8,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 12,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.white,
-    flex: 1,
-    textAlign: 'center',
-  },
-  logoutButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-  },
-  logoutButtonText: {
-    color: COLORS.secondary,
-    fontWeight: '800',
-    fontSize: 14,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  retryButton: {
-    marginTop: 20,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    backgroundColor: COLORS.primary,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: COLORS.white,
-    fontWeight: '600',
+  listContent: {
+    paddingVertical: 8,
+    flexGrow: 1,
   },
 });
 

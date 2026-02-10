@@ -7,6 +7,8 @@ import React, { useContext } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ScreenHeader from '../components/ScreenHeader';
+import EmptyState from '../components/EmptyState';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import { SCREEN_NAMES } from '../constants/constants';
@@ -68,14 +70,12 @@ const ProductListScreen = ({ navigation }) => {
     };
 
     if (Platform.OS === 'web') {
-        // Use browser native confirm for Web
         if (window.confirm(STRINGS.deleteMessage || 'Are you sure you want to delete this product?')) {
             performDelete();
         } else {
             console.log('⚪ Delete cancelled by user (Web)');
         }
     } else {
-        // Use React Native Alert for Mobile
         Alert.alert(
             STRINGS.deleteConfirm || 'Delete Product',
             STRINGS.deleteMessage || 'Are you sure you want to delete this product?',
@@ -107,21 +107,19 @@ const ProductListScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.headerButton}
-          onPress={() => navigation.navigate(SCREEN_NAMES.ORDERS_LIST)}
-        >
-          <Ionicons name="receipt" size={20} color={COLORS.white} />
-          <Text style={styles.headerButtonText}>{STRINGS.myOrders}</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>{STRINGS.products}</Text>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>{STRINGS.logout}</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title={STRINGS.products}
+        leftAction={{
+          icon: 'receipt-outline',
+          label: STRINGS.myOrders,
+          onPress: () => navigation.navigate(SCREEN_NAMES.ORDERS_LIST),
+        }}
+        rightAction={{
+          icon: 'log-out-outline',
+          label: STRINGS.logout,
+          onPress: handleLogout,
+        }}
+      />
 
       {/* Content */}
       {loading && !refreshing ? (
@@ -133,11 +131,16 @@ const ProductListScreen = ({ navigation }) => {
           renderItem={renderItem}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          contentContainerStyle={{ paddingVertical: 8 }}
+          contentContainerStyle={styles.listContent}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{STRINGS.noProducts || 'No products available'}</Text>
-            </View>
+            <EmptyState
+              icon="cube-outline"
+              title={STRINGS.noProducts || 'لا توجد منتجات'}
+              subtitle="قم بإضافة منتج جديد للبدء"
+              actionLabel={STRINGS.addProduct}
+              actionIcon="add-circle-outline"
+              onAction={() => navigation.navigate(SCREEN_NAMES.PRODUCT_FORM)}
+            />
           }
         />
       )}
@@ -146,8 +149,11 @@ const ProductListScreen = ({ navigation }) => {
       <TouchableOpacity 
         style={styles.fab} 
         onPress={() => navigation.navigate(SCREEN_NAMES.PRODUCT_FORM)}
+        activeOpacity={0.8}
       >
-        <Ionicons name="add" size={30} color={COLORS.white} />
+        <View style={styles.fabInner}>
+          <Ionicons name="add" size={28} color={COLORS.white} />
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -156,73 +162,32 @@ const ProductListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background || '#f5f5f5',
+    backgroundColor: COLORS.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: COLORS.primary || '#007AFF', // Fallback color
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    elevation: 3,
-    paddingTop: 40, // Safe area approximate
-  },
-  headerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 6,
-  },
-  headerButtonText: {
-    color: COLORS.white || '#fff',
-    fontWeight: '600',
-    fontSize: 12,
-    marginLeft: 6,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.white || '#fff',
-  },
-  logoutButton: {
-    paddingHorizontal: 12,
+  listContent: {
     paddingVertical: 8,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 6,
-  },
-  logoutButtonText: {
-    color: COLORS.white || '#fff',
-    fontWeight: '600',
-    fontSize: 12,
+    flexGrow: 1,
   },
   fab: {
     position: 'absolute',
     right: 20,
     bottom: 28,
-    backgroundColor: COLORS.primary || '#007AFF',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  },
+  fabInner: {
+    backgroundColor: COLORS.primary,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    elevation: 8,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    borderWidth: 3,
+    borderColor: COLORS.primaryLight + '40',
   },
-  emptyContainer: {
-    padding: 20,
-    alignItems: 'center',
-    marginTop: 50,
-  },
-  emptyText: {
-    color: '#888',
-    fontSize: 16,
-  }
 });
 
 export default ProductListScreen;

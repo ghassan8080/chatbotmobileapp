@@ -9,11 +9,13 @@ export const COLORS = {
   primary: '#6200EA', // Deep Purple
   primaryDark: '#3700B3',
   primaryLight: '#B388FF',
+  primaryPressed: '#5000C8',
 
   // Secondary
   secondary: '#FFAB00', // Vibrant Amber
   secondaryDark: '#FF6D00',
   secondaryLight: '#FFD180',
+  secondaryPressed: '#E09800',
 
   // UI Colors
   background: '#F5F6FA', // Very light blue-gray
@@ -28,7 +30,7 @@ export const COLORS = {
     highlight: '#6200EA',
   },
 
-  // Status & Categories (Matching the reference image)
+  // Status & Categories
   purple: '#6200EA',
   red: '#D50000',
   blue: '#2962FF',
@@ -40,7 +42,9 @@ export const COLORS = {
   success: '#00C853',
   warning: '#FFAB00',
   error: '#D50000',
+  errorLight: '#FFEBEE',
   info: '#2962FF',
+  infoLight: '#E3F2FD',
 
   // Neutrals
   white: '#FFFFFF',
@@ -62,12 +66,29 @@ export const COLORS = {
   input: {
     background: '#FFFFFF',
     border: '#E0E0E0',
+    borderFocused: '#6200EA',
     placeholder: '#9E9E9E',
     focus: '#6200EA',
+    error: '#D50000',
   },
-  
+
+  // Border
+  border: '#E0E0E0',
+  borderLight: '#F5F5F5',
+
   // Shadows
   shadow: 'rgba(98, 0, 234, 0.15)', // Purple-tinted shadow
+  shadowDark: 'rgba(0, 0, 0, 0.2)',
+
+  // Overlays
+  overlay: 'rgba(0, 0, 0, 0.5)',
+  overlayLight: 'rgba(0, 0, 0, 0.3)',
+
+  // Disabled
+  disabled: {
+    background: '#E0E0E0',
+    text: '#9E9E9E',
+  },
 };
 
 // Color utilities

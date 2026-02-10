@@ -6,23 +6,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useProducts } from '../hooks/useProducts';
 import { useImageUpload } from '../hooks/useImageUpload';
 import ImageUploader from '../components/ImageUploader';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ScreenHeader from '../components/ScreenHeader';
+import AppInput from '../components/AppInput';
+import AppButton from '../components/AppButton';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
-import { FORM_FIELDS } from '../constants/constants';
 import { validateProductForm } from '../utils/validators';
 
 const ProductFormScreen = ({ route, navigation }) => {
@@ -57,7 +55,6 @@ const ProductFormScreen = ({ route, navigation }) => {
       [field]: value,
     }));
 
-    // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -74,7 +71,6 @@ const ProductFormScreen = ({ route, navigation }) => {
   };
 
   const handleSubmit = async () => {
-    // Validate form
     const validation = validateProductForm({
       ...formData,
       images,
@@ -88,35 +84,13 @@ const ProductFormScreen = ({ route, navigation }) => {
     try {
       setSubmitting(true);
 
-      // Prepare images (convert to base64)
-
-      // On hook side we renamed uploadAllImages to prepareImagesForUpload
-      // We need to access that function from the hook
-      // But wait, we destructure it as uploadAllImages in line 33? 
-      // I need to update line 33 too.
-      // For now, let's assume I fix line 33 in a separate call or same call if possible.
-      // I can't do multiple chunks easily with replace_file_content if they are far apart.
-      // I will use multi_replace.
-
-      // ... actually I should use multi_replace for ProductFormScreen.
-      // Abort this specific tool call and use multi_replace in next step.
-      // Wait, I can't abort. I will just do a valid replacement here and a separate one for the destructure.
-      // Or I can just use `uploadAllImages` as the name for the new function in the hook? 
-      // No, semantic naming is better.
-
-      // Let's assume I will update the destructuring in the next step.
-      // Here I use the PROP that will be available.
-
-
       let base64Images = [];
       if (images.length > 0) {
         base64Images = await prepareImagesForUpload();
       }
 
-      // Convert to simple images array expected by backend: [{ name, base64 }, ...]
       const imagePayload = base64Images.map(img => ({ name: img.name, base64: img.base64 }));
 
-      // Prepare product data
       const productData = {
         id: isEditMode ? product.id : undefined,
         name: formData.name.trim(),
@@ -125,7 +99,6 @@ const ProductFormScreen = ({ route, navigation }) => {
         images: imagePayload,
       };
 
-      // Submit
       if (isEditMode) {
         await updateExistingProduct(productData);
         Alert.alert(STRINGS.success, STRINGS.updateSuccess);
@@ -167,98 +140,106 @@ const ProductFormScreen = ({ route, navigation }) => {
     }
   };
 
-  // Note: The actual image upload is handled by the useImageUpload hook
-  // We'll use the uploadAllImages function from the hook when needed
-
   if (loading && isEditMode) {
     return <LoadingSpinner text={STRINGS.loading} />;
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>
-          {isEditMode ? STRINGS.editProduct : STRINGS.addNewProduct}
-        </Text>
+    <View style={styles.container}>
+      <ScreenHeader
+        title={isEditMode ? STRINGS.editProduct : STRINGS.addNewProduct}
+        backgroundColor={COLORS.primary}
+        leftAction={{
+          icon: 'arrow-forward',
+          onPress: handleCancel,
+        }}
+      />
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{STRINGS.productName}</Text>
-          <TextInput
-            style={[styles.input, errors.name && styles.inputError]}
-            value={formData.name}
-            onChangeText={(text) => handleInputChange('name', text)}
-            placeholder={STRINGS.productName}
-            placeholderTextColor={COLORS.input.placeholder}
-          />
-          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-        </View>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Product Info Section */}
+          <View style={styles.section}>
+            <AppInput
+              label={STRINGS.productName}
+              value={formData.name}
+              onChangeText={(text) => handleInputChange('name', text)}
+              placeholder={STRINGS.productName}
+              icon="cube-outline"
+              error={errors.name}
+            />
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{STRINGS.productDescription}</Text>
-          <TextInput
-            style={[styles.input, styles.textArea, errors.description && styles.inputError]}
-            value={formData.description}
-            onChangeText={(text) => handleInputChange('description', text)}
-            placeholder={STRINGS.productDescription}
-            placeholderTextColor={COLORS.input.placeholder}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-          {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
-        </View>
+            <AppInput
+              label={STRINGS.productDescription}
+              value={formData.description}
+              onChangeText={(text) => handleInputChange('description', text)}
+              placeholder={STRINGS.productDescription}
+              multiline
+              numberOfLines={4}
+              icon="document-text-outline"
+              error={errors.description}
+            />
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{STRINGS.productPrice}</Text>
-          <TextInput
-            style={[styles.input, errors.price && styles.inputError]}
-            value={formData.price}
-            onChangeText={(text) => handleInputChange('price', text)}
-            placeholder={STRINGS.productPrice}
-            placeholderTextColor={COLORS.input.placeholder}
-            keyboardType="decimal-pad"
-          />
-          {errors.price && <Text style={styles.errorText}>{errors.price}</Text>}
-        </View>
+            <AppInput
+              label={STRINGS.productPrice}
+              value={formData.price}
+              onChangeText={(text) => handleInputChange('price', text)}
+              placeholder={STRINGS.productPrice}
+              keyboardType="decimal-pad"
+              icon="pricetag-outline"
+              error={errors.price}
+            />
+          </View>
 
-        <View style={styles.formGroup}>
-          <ImageUploader
-            images={images}
-            onAddImage={handleAddImage}
-            onRemoveImage={removeImage}
-            maxImages={4}
-          />
-          {errors.images && <Text style={styles.errorText}>{errors.images[0]}</Text>}
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.cancelButton]}
-            onPress={handleCancel}
-            disabled={submitting || uploading}
-          >
-            <Text style={styles.cancelButtonText}>{STRINGS.cancel}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.submitButton]}
-            onPress={handleSubmit}
-            disabled={submitting || uploading}
-          >
-            {submitting || uploading ? (
-              <Ionicons name="hourglass-outline" size={24} color={COLORS.white} />
-            ) : (
-              <Text style={styles.submitButtonText}>
-                {isEditMode ? STRINGS.update : STRINGS.add}
-              </Text>
+          {/* Images Section */}
+          <View style={styles.section}>
+            <ImageUploader
+              images={images}
+              onAddImage={handleAddImage}
+              onRemoveImage={removeImage}
+              maxImages={4}
+            />
+            {errors.images && (
+              <View style={styles.imageError}>
+                <AppInput error={errors.images[0]} editable={false} style={styles.hidden} />
+              </View>
             )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.buttonContainer}>
+            <View style={styles.buttonWrapper}>
+              <AppButton
+                title={STRINGS.cancel}
+                onPress={handleCancel}
+                variant="secondary"
+                disabled={submitting || uploading}
+                icon="close-outline"
+                size="medium"
+              />
+            </View>
+
+            <View style={styles.buttonWrapper}>
+              <AppButton
+                title={isEditMode ? STRINGS.update : STRINGS.add}
+                onPress={handleSubmit}
+                variant="primary"
+                loading={submitting || uploading}
+                disabled={submitting || uploading}
+                icon={submitting || uploading ? undefined : 'checkmark-circle-outline'}
+                size="medium"
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -267,92 +248,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  flex: {
+    flex: 1,
+  },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    marginBottom: 28,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-  },
-  formGroup: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: 10,
-    marginLeft: 4,
-  },
-  input: {
-    backgroundColor: COLORS.input.background,
-    borderWidth: 2,
-    borderColor: COLORS.input.border,
-    borderRadius: 14,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: COLORS.text.primary,
-    textAlign: 'right',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+  section: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
     elevation: 2,
-  },
-  textArea: {
-    minHeight: 120,
-    paddingTop: 14,
-    textAlignVertical: 'top',
-  },
-  inputError: {
-    borderColor: COLORS.error,
-    borderWidth: 2,
-  },
-  errorText: {
-    fontSize: 14,
-    color: COLORS.error,
-    marginTop: 6,
-    marginLeft: 4,
-    fontWeight: '500',
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: 16,
-    marginTop: 20,
+    gap: 12,
+    marginTop: 8,
   },
-  button: {
+  buttonWrapper: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 56,
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
-    elevation: 4,
   },
-  submitButton: {
-    backgroundColor: COLORS.primary,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.3,
+  imageError: {
+    marginTop: -10,
   },
-  submitButtonText: {
-    color: COLORS.white,
-    fontWeight: '700',
-    fontSize: 16,
-    letterSpacing: 0.3,
-  },
-  cancelButton: {
-    backgroundColor: COLORS.gray[100],
-    borderWidth: 2,
-    borderColor: COLORS.gray[200],
-  },
-  cancelButtonText: {
-    color: COLORS.text.primary,
-    fontWeight: '600',
-    fontSize: 16,
+  hidden: {
+    height: 0,
+    marginBottom: 0,
+    overflow: 'hidden',
   },
 });
 
