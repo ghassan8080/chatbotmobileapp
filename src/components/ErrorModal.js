@@ -4,23 +4,50 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Modal, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
+import AppButton from './AppButton';
 
 const ErrorModal = ({ visible, error, onClose, onRetry }) => {
+  const slideAnim = React.useRef(new Animated.Value(300)).current;
+
+  React.useEffect(() => {
+    if (visible) {
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: 300,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible]);
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <Animated.View
+          style={[
+            styles.container,
+            {
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
           <View style={styles.iconContainer}>
-            <Ionicons name="alert-circle" size={60} color={COLORS.error} />
+            <Ionicons name="alert-circle" size={64} color={COLORS.error} />
           </View>
 
           <Text style={styles.title}>{STRINGS.error}</Text>
@@ -28,18 +55,28 @@ const ErrorModal = ({ visible, error, onClose, onRetry }) => {
           <Text style={styles.message}>{error}</Text>
 
           <View style={styles.buttons}>
-            <TouchableOpacity style={styles.button} onPress={onRetry}>
-              <Text style={styles.buttonText}>{STRINGS.tryAgain}</Text>
-            </TouchableOpacity>
+            <AppButton
+              title={STRINGS.tryAgain}
+              onPress={onRetry}
+              variant="primary"
+              icon="refresh-outline"
+              size="medium"
+            />
 
             <TouchableOpacity 
               style={[styles.button, styles.cancelButton]} 
               onPress={onClose}
             >
-              <Text style={styles.cancelButtonText}>{STRINGS.cancel}</Text>
-            </TouchableOpacity>
+              <AppButton
+                title={STRINGS.cancel}
+                onPress={onClose}
+                variant="secondary"
+                icon="close-outline"
+                size="medium"
+              />
+
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -60,6 +97,11 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 350,
     alignItems: 'center',
+    elevation: 5,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
   },
   iconContainer: {
     marginBottom: 16,
@@ -81,26 +123,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     width: '100%',
-  },
-  button: {
-    flex: 1,
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: COLORS.white,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  cancelButton: {
-    backgroundColor: COLORS.gray[200],
-  },
-  cancelButtonText: {
-    color: COLORS.text.primary,
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });
 

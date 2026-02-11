@@ -75,7 +75,7 @@ const AppButton = ({
       ]}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
       {loading ? (
         <ActivityIndicator size="small" color={vs.text} />

@@ -97,11 +97,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   elevated: {
-    elevation: 6,
-    shadowColor: 'rgba(0,0,0,0.3)',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
+    elevation: 5,
+    shadowColor: 'rgba(0,0,0,0.25)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
   content: {
     flexDirection: 'row',
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 19,
-    fontWeight: '800',
+    fontWeight: '700',
     flex: 1,
     textAlign: 'center',
     letterSpacing: 0.3,

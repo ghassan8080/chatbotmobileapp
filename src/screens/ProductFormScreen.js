@@ -246,7 +246,7 @@ const ProductFormScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F6F7FB',
   },
   flex: {
     flex: 1,
@@ -257,10 +257,10 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: COLORS.white,
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    elevation: 2,
+    elevation: 3,
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

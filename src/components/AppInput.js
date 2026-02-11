@@ -61,6 +61,13 @@ const AppInput = ({
           multiline && styles.inputWrapperMultiline,
           { borderColor, borderWidth },
           !editable && styles.inputDisabled,
+          isFocused && {
+            elevation: 2,
+            shadowColor: COLORS.input.focus,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+          },
         ]}
       >
         {icon && (

@@ -137,7 +137,7 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F6F7FB',
   },
   scrollContent: {
     flexGrow: 1,
@@ -158,8 +158,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     elevation: 6,
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
     shadowRadius: 12,
     borderWidth: 3,
     borderColor: COLORS.primaryLight + '30',
@@ -168,11 +168,11 @@ const styles = StyleSheet.create({
     fontSize: 42,
   },
   welcomeText: {
-    fontSize: 30,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '700',
     color: COLORS.text.primary,
     marginTop: 8,
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 16,
@@ -182,13 +182,13 @@ const styles = StyleSheet.create({
   },
   form: {
     backgroundColor: COLORS.white,
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 24,
     elevation: 4,
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
   },
   generalError: {
     backgroundColor: COLORS.errorLight,

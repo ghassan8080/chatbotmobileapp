@@ -3,8 +3,8 @@
  * Main screen for displaying and managing products
  */
 
-import React, { useContext } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform } from 'react-native';
+import React, { useContext, useRef } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ScreenHeader from '../components/ScreenHeader';
@@ -19,6 +19,25 @@ import { AuthContext } from '../context/AuthContext';
 const ProductListScreen = ({ navigation }) => {
   const { products, loading, refreshing, onRefresh, removeProduct } = useProducts();
   const { logout } = useContext(AuthContext);
+  const fabScale = useRef(new Animated.Value(1)).current;
+
+  const handleFabPressIn = () => {
+    Animated.spring(fabScale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handleFabPressOut = () => {
+    Animated.spring(fabScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
 
   const handleLogout = () => {
     console.log('🔴 PRODUCT SCREEN LOGOUT CHECK');
@@ -149,11 +168,13 @@ const ProductListScreen = ({ navigation }) => {
       <TouchableOpacity 
         style={styles.fab} 
         onPress={() => navigation.navigate(SCREEN_NAMES.PRODUCT_FORM)}
-        activeOpacity={0.8}
+        activeOpacity={1}
+        onPressIn={handleFabPressIn}
+        onPressOut={handleFabPressOut}
       >
-        <View style={styles.fabInner}>
+        <Animated.View style={[styles.fabInner, { transform: [{ scale: fabScale }] }]}>
           <Ionicons name="add" size={28} color={COLORS.white} />
-        </View>
+        </Animated.View>
       </TouchableOpacity>
     </View>
   );
@@ -162,7 +183,7 @@ const ProductListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F6F7FB',
   },
   listContent: {
     paddingVertical: 8,
@@ -175,18 +196,16 @@ const styles = StyleSheet.create({
   },
   fabInner: {
     backgroundColor: COLORS.primary,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 8,
+    elevation: 6,
     shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    borderWidth: 3,
-    borderColor: COLORS.primaryLight + '40',
   },
 });
 

@@ -25,6 +25,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ProductDetailScreen = ({ route, navigation }) => {
   const { product } = route.params;
   const { removeProduct } = useProducts();
+  const [activeDotIndex, setActiveDotIndex] = React.useState(0);
 
   // Collect all image URLs
   const images = [];
@@ -86,6 +87,10 @@ const ProductDetailScreen = ({ route, navigation }) => {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               style={styles.imageContainer}
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+                setActiveDotIndex(index);
+              }}
             >
               {images.map((imageUrl, index) => (
                 <Image
@@ -102,7 +107,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
                 {images.map((_, index) => (
                   <View
                     key={index}
-                    style={[styles.dot, index === 0 && styles.dotActive]}
+                    style={[styles.dot, index === activeDotIndex && styles.dotActive]}
                   />
                 ))}
               </View>
@@ -171,7 +176,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F6F7FB',
   },
   scrollView: {
     flex: 1,
@@ -244,12 +249,12 @@ const styles = StyleSheet.create({
     minHeight: 300,
   },
   name: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '700',
     color: COLORS.text.primary,
     marginBottom: 16,
-    lineHeight: 34,
-    letterSpacing: -0.5,
+    lineHeight: 32,
+    letterSpacing: -0.3,
   },
   priceContainer: {
     marginBottom: 24,
@@ -281,10 +286,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   price: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '800',
     color: COLORS.primary,
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
   },
   currency: {
     fontSize: 14,

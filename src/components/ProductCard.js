@@ -48,16 +48,18 @@ const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
         <TouchableOpacity 
           style={[styles.actionButton, styles.editButton]} 
           onPress={() => onEdit && onEdit(product)}
+          activeOpacity={0.7}
         >
-          <Text style={styles.buttonEmoji}>✏️</Text>
+          <Ionicons name="create-outline" size={18} color={COLORS.primary} style={styles.actionIcon} />
           <Text style={styles.editButtonText}>{STRINGS.edit}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.actionButton, styles.deleteButton]} 
           onPress={() => onDelete && onDelete(product)}
+          activeOpacity={0.7}
         >
-          <Text style={styles.buttonEmoji}>🗑️</Text>
+          <Ionicons name="trash-outline" size={18} color={COLORS.red} style={styles.actionIcon} />
           <Text style={styles.deleteButtonText}>{STRINGS.delete}</Text>
         </TouchableOpacity>
       </View>
@@ -67,45 +69,46 @@ const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.cardBackground,
-    marginVertical: 10,
+    backgroundColor: COLORS.white,
+    marginVertical: 12,
     marginHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
     elevation: 4,
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.gray[200],
+    borderColor: COLORS.gray[100],
   },
   header: {
     flexDirection: 'row-reverse', // RTL: Name Right, Price Left
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: 16,
-    paddingBottom: 8,
+    paddingBottom: 12,
   },
   titleContainer: {
     flex: 1,
     marginLeft: 12,
   },
   name: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 17,
+    fontWeight: '700',
     color: COLORS.text.primary,
     textAlign: 'right', // RTL
-    lineHeight: 26,
+    lineHeight: 24,
   },
   price: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '800',
     color: COLORS.primary,
     textAlign: 'left', // LTR for numbers
+    lineHeight: 24,
   },
   currency: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.text.secondary,
     fontWeight: '600',
   },
@@ -132,17 +135,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: COLORS.gray[200],
+    borderColor: COLORS.gray[150],
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
   },
   divider: {
     height: 1,
     backgroundColor: COLORS.gray[100],
     marginHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   actions: {
     flexDirection: 'row-reverse', // Buttons flow from Right
@@ -157,36 +165,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 12,
-    elevation: 1, // Slight 3D pop
-    shadowColor: COLORS.black,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
   },
   editButton: {
     backgroundColor: COLORS.white,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.primaryLight,
   },
   editButtonText: {
     color: COLORS.primary,
     fontWeight: '700',
     fontSize: 14,
-    marginLeft: 8,
+    marginLeft: 6,
   },
   deleteButton: {
     backgroundColor: COLORS.white,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.red,
   },
   deleteButtonText: {
     color: COLORS.red,
     fontWeight: '700',
     fontSize: 14,
-    marginLeft: 8,
+    marginLeft: 6,
   },
-  buttonEmoji: {
-    fontSize: 16,
+  actionIcon: {
+    marginLeft: 6,
   },
 });
 export default ProductCard;
