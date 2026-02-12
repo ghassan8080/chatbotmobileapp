@@ -1,35 +1,29 @@
-/**
- * OrderCard Component
- * Displays an order in a card layout
- */
-
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 
 const OrderCard = ({ order, onPress, onConfirmOrder }) => {
   const [isConfirming, setIsConfirming] = useState(false);
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, { toValue: 0.98, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, { toValue: 1, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  };
 
   // Get order status with Arabic support
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-      case 'قيد الانتظار':
-        return COLORS.warning;
-      case 'confirmed':
-      case 'مؤكد':
-        return COLORS.primary; // Changed to green
-      case 'delivered':
-      case 'تم التسليم':
-        return COLORS.info; // Changed to blue
-      case 'cancelled':
-      case 'ملغى':
-        return COLORS.error;
-      default:
-        return COLORS.gray[400];
-    }
+  const getStatusConfig = (status) => {
+    const s = status?.toLowerCase();
+    if (s === 'pending' || s === 'قيد الانتظار') return { color: COLORS.warning, icon: 'time-outline', label: 'قيد الانتظار', bg: '#FFF8E1' }; // Amber-50
+    if (s === 'confirmed' || s === 'مؤكد') return { color: COLORS.success, icon: 'checkmark-circle-outline', label: 'مؤكد', bg: '#E8F5E9' }; // Green-50
+    if (s === 'delivered' || s === 'تم التسليم') return { color: COLORS.info, icon: 'bicycle-outline', label: 'تم التسليم', bg: '#E3F2FD' }; // Blue-50
+    if (s === 'cancelled' || s === 'ملغى') return { color: COLORS.error, icon: 'close-circle-outline', label: 'ملغى', bg: '#FFEBEE' }; // Red-50
+    return { color: COLORS.gray[500], icon: 'help-circle-outline', label: status, bg: COLORS.gray[100] };
   };
 
   // Format date
@@ -39,8 +33,8 @@ const OrderCard = ({ order, onPress, onConfirmOrder }) => {
       const date = new Date(dateString);
       return date.toLocaleDateString('ar-SA', {
         year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
+        month: 'short',
+        day: 'numeric',
       });
     } catch {
       return dateString;
@@ -52,41 +46,29 @@ const OrderCard = ({ order, onPress, onConfirmOrder }) => {
   const productName = order.product_name || order.selectedProduct || 'منتج غير محدد';
   const phoneNumber = order.phone || 'N/A';
   const deliveryAddress = order.delivery_address || order.address || 'N/A';
-  const status = order.status || 'pending';
+  const rawStatus = order.status || 'pending';
   const orderDate = order.created_at || order.order_date || new Date().toISOString();
   const quantity = order.quantity || 1;
+  const statusConfig = getStatusConfig(rawStatus);
 
   // Check if order is pending
-  const isPending = status?.toLowerCase() === 'pending' || status?.toLowerCase() === 'قيد الانتظار';
+  const isPending = rawStatus?.toLowerCase() === 'pending' || rawStatus?.toLowerCase() === 'قيد الانتظار';
 
   // Handle confirm order - using window.confirm for web compatibility
   const handleConfirmOrder = async () => {
-    console.log('🔵 CONFIRM BUTTON CLICKED - Order ID:', orderId);
-    console.log('🔵 onConfirmOrder function exists?', !!onConfirmOrder);
-    
-    // Use window.confirm for web instead of Alert.alert
-    const confirmed = window.confirm('هل تريد تثبيت هذا الحجز؟');
-    
-    if (!confirmed) {
-      console.log('🔵 User cancelled confirmation');
-      return;
+    // Web compatibility check
+    if (Platform.OS === 'web') {
+        if (!window.confirm('هل تريد تثبيت هذا الحجز؟')) return;
     }
     
-    console.log('🔵 User confirmed, starting confirmation process...');
     setIsConfirming(true);
-    
     try {
       if (onConfirmOrder) {
-        console.log('🔵 Calling parent onConfirmOrder function...');
         await onConfirmOrder(orderId, 'confirmed');
-        console.log('✅ onConfirmOrder completed successfully');
-        alert('تم تثبيت الحجز بنجاح!');
-      } else {
-        console.error('🔴 onConfirmOrder is not defined!');
-        alert('خطأ: دالة التثبيت غير موجودة');
+        // Success often handled by parent refresh, but we can alert if needed
       }
     } catch (error) {
-      console.error('🔴 Error in handleConfirmOrder:', error);
+      console.error('Order confirmation failed', error);
       alert('خطأ: ' + (error.message || 'فشل تثبيت الحجز'));
     } finally {
       setIsConfirming(false);
@@ -94,229 +76,187 @@ const OrderCard = ({ order, onPress, onConfirmOrder }) => {
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
-      onPress={onPress} 
-      activeOpacity={0.7}
-    >
-      {/* Status Badge */}
-      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
-        <Text style={styles.statusText}>{status}</Text>
-      </View>
-
-      {/* Order Header */}
-      <View style={styles.header}>
-        <Text style={styles.orderId}>طلب رقم: {orderId}</Text>
-        <Text style={styles.date}>{formatDate(orderDate)}</Text>
-      </View>
-
-      {/* Product Info */}
-      <View style={styles.section}>
-        <View style={styles.sectionRow}>
-          <Ionicons name="cube" size={16} color={COLORS.primary} />
-          <Text style={styles.label}>المنتج:</Text>
-          <Text style={styles.value} numberOfLines={1}>{productName}</Text>
+    <Animated.View style={[{ transform: [{ scale: scaleValue }] }]}>
+      <TouchableOpacity 
+        style={styles.container} 
+        onPress={onPress} 
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        
+        {/* Header: ID & Status */}
+        <View style={styles.header}>
+            <View style={styles.headerInfo}>
+                <Text style={styles.orderId}>طلب #{orderId}</Text>
+                <Text style={styles.date}>{formatDate(orderDate)}</Text>
+            </View>
+            <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
+                <Ionicons name={statusConfig.icon} size={14} color={statusConfig.color} />
+                <Text style={[styles.statusText, { color: statusConfig.color }]}>{statusConfig.label}</Text>
+            </View>
         </View>
-        <View style={styles.sectionRow}>
-          <Ionicons name="layers" size={16} color={COLORS.primary} />
-          <Text style={styles.label}>الكمية:</Text>
-          <Text style={styles.value}>{quantity}</Text>
-        </View>
-      </View>
 
-      {/* Contact & Delivery Info */}
-      <View style={styles.section}>
-        <View style={styles.sectionRow}>
-          <Ionicons name="call" size={16} color={COLORS.primary} />
-          <Text style={styles.label}>الهاتف:</Text>
-          <Text style={styles.value}>{phoneNumber}</Text>
-        </View>
-        <View style={styles.addressRow}>
-          <Ionicons name="location" size={16} color={COLORS.primary} />
-          <Text style={styles.label}>عنوان التسليم:</Text>
-          <Text style={styles.addressValue} numberOfLines={2}>
-            {deliveryAddress}
-          </Text>
-        </View>
-      </View>
+        <View style={styles.divider} />
 
-      {/* Confirm Order Button - Only show for pending orders */}
-      {isPending && (
-        <View style={styles.actionSection}>
-          <TouchableOpacity
-            style={[
-              styles.confirmButton,
-              isConfirming && styles.confirmButtonDisabled,
-            ]}
-            onPress={handleConfirmOrder}
-            disabled={isConfirming}
-          >
-            {isConfirming ? (
-              <>
-                <Ionicons
-                  name="hourglass"
-                  size={16}
-                  color={COLORS.white}
-                  style={styles.buttonIcon}
-                />
-                <Text style={styles.confirmButtonText}>جاري التثبيت...</Text>
-              </>
-            ) : (
-              <>
-                <Ionicons
-                  name="checkmark-circle"
-                  size={16}
-                  color={COLORS.white}
-                  style={styles.buttonIcon}
-                />
-                <Text style={styles.confirmButtonText}>{STRINGS.confirmOrder}</Text>
-              </>
-            )}
-          </TouchableOpacity>
+        {/* Product Info */}
+        <View style={styles.section}>
+            <View style={styles.row}>
+                <Text style={styles.label}>المنتج</Text>
+                <Text style={styles.value} numberOfLines={1}>{productName}</Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.label}>الكمية</Text>
+                <Text style={styles.value}>{quantity}</Text>
+            </View>
         </View>
-      )}
 
-      {/* Arrow indicator */}
-      <View style={styles.arrow}>
-        <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
-      </View>
-    </TouchableOpacity>
+        <View style={styles.divider} />
+
+        {/* Contact Info */}
+        <View style={styles.section}>
+             <View style={styles.row}>
+                <View style={styles.iconLabel}>
+                    <Ionicons name="call-outline" size={14} color={COLORS.text.secondary} />
+                    <Text style={[styles.label, { marginRight: 4 }]}>الهاتف</Text>
+                </View>
+                <Text style={styles.value} selectable>{phoneNumber}</Text>
+            </View>
+            <View style={[styles.row, { alignItems: 'flex-start' }]}>
+                <View style={[styles.iconLabel, { marginTop: 2 }]}>
+                    <Ionicons name="location-outline" size={14} color={COLORS.text.secondary} />
+                    <Text style={[styles.label, { marginRight: 4 }]}>العنوان</Text>
+                </View>
+                <Text style={[styles.value, { flex: 1, textAlign: 'left' }]} numberOfLines={2}>{deliveryAddress}</Text>
+            </View>
+        </View>
+
+        {/* Actions */}
+        {isPending && (
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    style={[styles.confirmButton, isConfirming && styles.disabledButton]}
+                    onPress={handleConfirmOrder}
+                    disabled={isConfirming}
+                >
+                    {isConfirming ? (
+                         <Text style={styles.confirmButtonText}>جاري التثبيت...</Text>
+                    ) : (
+                        <>
+                            <Ionicons name="checkmark-circle" size={18} color={COLORS.white} style={{ marginRight: 8 }} />
+                            <Text style={styles.confirmButtonText}>{STRINGS.confirmOrder}</Text>
+                        </>
+                    )}
+                </TouchableOpacity>
+            </View>
+        )}
+
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.white,
-    marginVertical: 12,
+    backgroundColor: COLORS.cardBackground || '#FFFFFF',
+    marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 16,
-    overflow: 'hidden',
+    padding: 16,
     elevation: 4,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: COLORS.shadowDark || '#000',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    borderRightWidth: 5,
-    borderRightColor: COLORS.primary,
+    // Removed side border for cleaner look
+  },
+  header: {
+    flexDirection: 'row-reverse', // RTL: ID Right, Status Left
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  headerInfo: {
+      alignItems: 'flex-end',
+  },
+  orderId: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    textAlign: 'right',
+  },
+  date: {
+    fontSize: 12,
+    color: COLORS.text.secondary,
+    marginTop: 2,
+    textAlign: 'right',
   },
   statusBadge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    zIndex: 10,
-    elevation: 2,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    gap: 6,
   },
   statusText: {
-    color: COLORS.white,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
   },
-  header: {
-    padding: 16,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray[100],
-    marginTop: 8,
-    alignItems: 'flex-end',
-  },
-  orderId: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    textAlign: 'right',
-    lineHeight: 24,
-  },
-  date: {
-    fontSize: 13,
-    color: COLORS.text.secondary,
-    marginTop: 4,
-    textAlign: 'right',
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray[100],
+    marginBottom: 12,
   },
   section: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray[100],
+    gap: 8,
+    marginBottom: 12,
   },
-  sectionRow: {
-    flexDirection: 'row-reverse',
+  row: {
+    flexDirection: 'row-reverse', // Label right, Value left
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-    justifyContent: 'flex-start',
   },
-  addressRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'flex-start',
+  iconLabel: {
+      flexDirection: 'row-reverse',
+      alignItems: 'center',
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
     color: COLORS.text.secondary,
-    marginRight: 8,
-    marginLeft: 0,
-    width: 100,
-    textAlign: 'right',
+    fontWeight: '500',
+    marginLeft: 12, // Gap between label and value
   },
   value: {
-    fontSize: 15,
-    color: COLORS.text.primary,
-    flex: 1,
-    fontWeight: '600',
-    textAlign: 'right',
-  },
-  addressValue: {
     fontSize: 14,
     color: COLORS.text.primary,
-    flex: 1,
-    lineHeight: 20,
-    textAlign: 'right',
+    fontWeight: '600',
+    textAlign: 'left', // Values often look better aligned left (numbers, etc)
   },
-  actionSection: {
-    padding: 16,
-    backgroundColor: COLORS.gray[50],
+  footer: {
+      marginTop: 4,
   },
   confirmButton: {
-    flexDirection: 'row-reverse',
+    backgroundColor: COLORS.success,
+    borderRadius: 12,
+    height: 48,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.success,
-    paddingVertical: 14,
-    borderRadius: 12,
-    elevation: 3,
+    elevation: 2,
     shadowColor: COLORS.success,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
+    shadowOffset: {width: 0, height: 2},
     shadowRadius: 4,
-    minHeight: 48,
   },
-  confirmButtonDisabled: {
-    opacity: 0.6,
-    backgroundColor: COLORS.gray[400],
+  disabledButton: {
+      opacity: 0.7,
+      backgroundColor: COLORS.gray[400],
   },
   confirmButtonText: {
-    color: COLORS.white,
-    fontWeight: '700',
-    fontSize: 16,
-    marginRight: 8,
-  },
-  buttonIcon: {
-    marginLeft: 4,
-  },
-  arrow: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    opacity: 0.3,
-    transform: [{ rotate: '180deg' }],
+      color: COLORS.white,
+      fontWeight: '700',
+      fontSize: 15,
   },
 });
 

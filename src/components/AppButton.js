@@ -5,8 +5,15 @@
  * States: loading, disabled
  */
 
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
+import React, { useRef } from 'react';
+import { 
+  Pressable, 
+  Text, 
+  StyleSheet, 
+  ActivityIndicator, 
+  View,
+  Animated
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 
@@ -43,78 +50,9 @@ const VARIANT_STYLES = {
   },
 };
 
-const AppButton = ({
-  title,
-  onPress,
-  variant = 'primary',
-  loading = false,
-  disabled = false,
-  icon,
-  iconPosition = 'left',
-  size = 'medium',
-  fullWidth = true,
-  style,
-}) => {
-  const vs = VARIANT_STYLES[variant] || VARIANT_STYLES.primary;
-  const isDisabled = disabled || loading;
-  const sizeStyle = SIZE_STYLES[size] || SIZE_STYLES.medium;
-
-  return (
-    <TouchableOpacity
-      style={[
-        styles.base,
-        sizeStyle.button,
-        {
-          backgroundColor: vs.bg,
-          borderColor: vs.border,
-          shadowColor: vs.shadow,
-        },
-        fullWidth && styles.fullWidth,
-        isDisabled && styles.disabled,
-        style,
-      ]}
-      onPress={onPress}
-      disabled={isDisabled}
-      activeOpacity={0.8}
-    >
-      {loading ? (
-        <ActivityIndicator size="small" color={vs.text} />
-      ) : (
-        <View style={styles.content}>
-          {icon && iconPosition === 'left' && (
-            <Ionicons
-              name={icon}
-              size={sizeStyle.iconSize}
-              color={vs.text}
-              style={styles.iconLeft}
-            />
-          )}
-          <Text
-            style={[
-              styles.text,
-              sizeStyle.text,
-              { color: vs.text },
-            ]}
-          >
-            {title}
-          </Text>
-          {icon && iconPosition === 'right' && (
-            <Ionicons
-              name={icon}
-              size={sizeStyle.iconSize}
-              color={vs.text}
-              style={styles.iconRight}
-            />
-          )}
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-};
-
 const SIZE_STYLES = {
   small: {
-    button: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, minHeight: 40 },
+    button: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, minHeight: 48 },
     text: { fontSize: 14 },
     iconSize: 16,
   },
@@ -128,6 +66,100 @@ const SIZE_STYLES = {
     text: { fontSize: 18 },
     iconSize: 22,
   },
+};
+
+const AppButton = ({
+  title,
+  onPress,
+  variant = 'primary',
+  loading = false,
+  disabled = false,
+  icon,
+  iconPosition = 'left',
+  size = 'medium',
+  fullWidth = true,
+  style,
+  textStyle
+}) => {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+  const vs = VARIANT_STYLES[variant] || VARIANT_STYLES.primary;
+  const sizeStyle = SIZE_STYLES[size] || SIZE_STYLES.medium;
+  const isDisabled = disabled || loading;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={[{ transform: [{ scale: scaleValue }] }, fullWidth && styles.fullWidth]}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.base,
+          sizeStyle.button,
+          {
+            backgroundColor: vs.bg,
+            borderColor: vs.border,
+            shadowColor: vs.shadow,
+            opacity: pressed ? 0.9 : 1,
+          },
+          fullWidth && styles.fullWidth,
+          isDisabled && styles.disabled,
+          style,
+        ]}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={isDisabled}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color={vs.text} />
+        ) : (
+          <View style={styles.content}>
+            {icon && iconPosition === 'left' && (
+              <Ionicons
+                name={icon}
+                size={sizeStyle.iconSize}
+                color={vs.text}
+                style={styles.iconLeft}
+              />
+            )}
+            <Text
+              style={[
+                styles.text,
+                sizeStyle.text,
+                { color: vs.text },
+                textStyle
+              ]}
+            >
+              {title}
+            </Text>
+            {icon && iconPosition === 'right' && (
+              <Ionicons
+                name={icon}
+                size={sizeStyle.iconSize}
+                color={vs.text}
+                style={styles.iconRight}
+              />
+            )}
+          </View>
+        )}
+      </Pressable>
+    </Animated.View>
+  );
 };
 
 const styles = StyleSheet.create({

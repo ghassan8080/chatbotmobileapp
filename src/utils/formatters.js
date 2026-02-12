@@ -11,8 +11,8 @@ import { STRINGS } from '../constants/strings';
  * @returns {string} Formatted price string
  */
 export const formatPrice = (price) => {
-  const formattedPrice = parseFloat(price).toFixed(2);
-  return `${formattedPrice} ${STRINGS.currency}`;
+  if (!price) return '0';
+  return price.toString();
 };
 
 /**
@@ -115,7 +115,7 @@ export const formatProductForDisplay = (product) => {
 
   return {
     ...product,
-    price: formatPrice(product.price),
+    price: product.price, // Pass raw price, let component handle formatting
     images,
     hasImages: images.length > 0,
   };

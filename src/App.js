@@ -11,6 +11,7 @@ import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './context/AuthContext';
 import { COLORS } from './constants/colors';
 import { APP_CONFIG } from './config/appConfig';
+import { NotificationProvider } from './context/NotificationContext';
 
 // Ensure RTL layout is enabled for Arabic
 if (!I18nManager.isRTL) {
@@ -23,7 +24,9 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="auto" backgroundColor={COLORS.primary} />
       <AuthProvider>
-        <AppNavigator />
+        <NotificationProvider>
+          <AppNavigator />
+        </NotificationProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

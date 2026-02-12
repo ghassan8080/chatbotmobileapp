@@ -15,10 +15,14 @@ import { SCREEN_NAMES } from '../constants/constants';
 import ProductCard from '../components/ProductCard';
 import { useProducts } from '../hooks/useProducts';
 import { AuthContext } from '../context/AuthContext';
+import { getErrorMessage } from '../services/errorHandler';
+
+import { NotificationContext } from '../context/NotificationContext';
 
 const ProductListScreen = ({ navigation }) => {
   const { products, loading, refreshing, onRefresh, removeProduct } = useProducts();
   const { logout } = useContext(AuthContext);
+  const { pendingCount } = useContext(NotificationContext);
   const fabScale = useRef(new Animated.Value(1)).current;
 
   const handleFabPressIn = () => {
@@ -40,12 +44,9 @@ const ProductListScreen = ({ navigation }) => {
   };
 
   const handleLogout = () => {
-    console.log('🔴 PRODUCT SCREEN LOGOUT CHECK');
-    
     if (Platform.OS === 'web') {
         const confirmed = window.confirm(STRINGS.logoutConfirm);
         if (confirmed) {
-            console.log('User confirmed logout (Web)');
             logout();
         }
     } else {
@@ -57,7 +58,6 @@ const ProductListScreen = ({ navigation }) => {
         {
             text: STRINGS.logout,
             onPress: () => {
-                console.log('User confirmed logout (Native)');
                 logout();
             },
             style: 'destructive',
@@ -67,32 +67,25 @@ const ProductListScreen = ({ navigation }) => {
   };
 
   const handleDelete = (product) => {
-    console.log('🔴 DELETE ACTION TRIGGERED', product);
     const productId = product.id || product.product_id || product._id;
-    console.log('🔴 Target Product ID:', productId);
 
     if (!productId) {
-      console.error('❌ Error: No valid product ID found to delete');
       Alert.alert('Error', 'Cannot delete product: Invalid ID');
       return;
     }
 
     const performDelete = async () => {
-      console.log('🔴 CONFIRMED: Proceeding with delete for ID:', productId);
       try {
         await removeProduct(productId);
-        console.log('✅ Delete operation completed successfully');
       } catch (error) {
-        console.error('❌ Delete operation failed:', error);
-        Alert.alert(STRINGS.error || 'Error', error.message);
+        const userMessage = getErrorMessage(error, 'ProductListScreen:handleDelete');
+        Alert.alert(STRINGS.error || 'Error', userMessage);
       }
     };
 
     if (Platform.OS === 'web') {
         if (window.confirm(STRINGS.deleteMessage || 'Are you sure you want to delete this product?')) {
             performDelete();
-        } else {
-            console.log('⚪ Delete cancelled by user (Web)');
         }
     } else {
         Alert.alert(
@@ -102,7 +95,6 @@ const ProductListScreen = ({ navigation }) => {
                 { 
                     text: STRINGS.cancel, 
                     style: 'cancel',
-                    onPress: () => console.log('⚪ Delete cancelled by user (Mobile)')
                 },
                 {
                     text: STRINGS.delete || 'Delete',
@@ -129,14 +121,14 @@ const ProductListScreen = ({ navigation }) => {
       <ScreenHeader
         title={STRINGS.products}
         leftAction={{
-          icon: 'receipt-outline',
-          label: STRINGS.myOrders,
-          onPress: () => navigation.navigate(SCREEN_NAMES.ORDERS_LIST),
+          icon: 'log-out-outline',
+          onPress: handleLogout,
         }}
         rightAction={{
-          icon: 'log-out-outline',
-          label: STRINGS.logout,
-          onPress: handleLogout,
+          icon: 'notifications-outline',
+          label: pendingCount > 0 ? String(pendingCount) : null,
+          textColor: pendingCount > 0 ? COLORS.error : null,
+          onPress: () => navigation.navigate(SCREEN_NAMES.ORDERS_LIST),
         }}
       />
 
@@ -180,6 +172,9 @@ const ProductListScreen = ({ navigation }) => {
   );
 };
 
+
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -201,11 +196,11 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 6,
+    elevation: 8, // Increased elevation
     shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowRadius: 12,
   },
 });
 

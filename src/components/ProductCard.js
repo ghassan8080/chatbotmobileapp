@@ -1,10 +1,5 @@
-/**
- * ProductCard Component
- * Displays a product in a card layout
- */
-
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Animated, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
@@ -12,116 +7,146 @@ import { STRINGS } from '../constants/strings';
 const ProductCard = ({ product, onEdit, onDelete, onPress }) => {
   const images = product.images || [];
   const hasImages = images.length > 0;
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  // Format price helper
+  const formatPrice = (price) => {
+    if (!price) return '0';
+    // Remove non-numeric characters except decimal point
+    const cleanPrice = String(price).replace(/[^0-9.]/g, '');
+    const numericPrice = Number(cleanPrice);
+    if (isNaN(numericPrice)) return '0';
+    return Math.floor(numericPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.98,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
-      <View style={styles.header}>
+    <Animated.View style={[{ transform: [{ scale: scaleValue }] }]}>
+      <TouchableOpacity 
+        style={styles.container} 
+        onPress={onPress} 
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        {/* 1. Title */}
         <View style={styles.titleContainer}>
             <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
         </View>
-        <Text style={styles.price}>{product.price} <Text style={styles.currency}>د.ع</Text></Text>
-      </View>
 
-      <Text style={styles.description} numberOfLines={3}>
-        {product.description}
-      </Text>
+        {/* 2. Description (Short) */}
+        {product.description ? (
+            <Text style={styles.description} numberOfLines={2}>
+                {product.description}
+            </Text>
+        ) : null}
 
-      {hasImages && (
-        <View style={styles.imageSection}>
-            <ScrollView horizontal style={styles.imageContainer} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.imageScrollContent}>
-            {images.map((imageUrl, index) => (
-                <View key={index} style={styles.imageWrapper}>
-                    <Image
-                    source={{ uri: imageUrl }}
-                    style={styles.image}
-                    resizeMode="cover"
-                    />
-                </View>
-            ))}
-            </ScrollView>
+        {/* 3. Image Gallery */}
+        {hasImages && (
+          <View style={styles.imageSection}>
+              <ScrollView 
+                horizontal 
+                style={styles.imageContainer} 
+                showsHorizontalScrollIndicator={false} 
+                contentContainerStyle={styles.imageScrollContent}
+              >
+              {images.map((imageUrl, index) => (
+                  <View key={index} style={styles.imageWrapper}>
+                      <Image
+                        source={{ uri: imageUrl }}
+                        style={styles.image}
+                        resizeMode="cover"
+                      />
+                  </View>
+              ))}
+              </ScrollView>
+          </View>
+        )}
+
+        {/* 4. Price */}
+        <View style={styles.priceContainer}>
+            <Text style={styles.price}>{formatPrice(product.price)} <Text style={styles.currency}>د.ع</Text></Text>
         </View>
-      )}
 
-      <View style={styles.divider} />
+        {/* 5. Action Bar */}
+        <View style={styles.actionBar}>
+            <TouchableOpacity 
+                style={styles.editButton} 
+                onPress={() => onEdit && onEdit(product)}
+                activeOpacity={0.85}
+            >
+                <Ionicons name="create-outline" size={20} color={COLORS.primary} style={styles.actionIcon} />
+                <Text style={styles.editButtonText}>{STRINGS.edit || 'تعديل'}</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.actionDivider} />
 
-      <View style={styles.actions}>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.editButton]} 
-          onPress={() => onEdit && onEdit(product)}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="create-outline" size={18} color={COLORS.primary} style={styles.actionIcon} />
-          <Text style={styles.editButtonText}>{STRINGS.edit}</Text>
-        </TouchableOpacity>
+            <TouchableOpacity 
+                style={styles.deleteButton} 
+                onPress={() => onDelete && onDelete(product)}
+                activeOpacity={0.85}
+            >
+                <Ionicons name="trash-outline" size={20} color="#D32F2F" />
+                <Text style={styles.deleteButtonText}>حذف</Text>
+            </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.deleteButton]} 
-          onPress={() => onDelete && onDelete(product)}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="trash-outline" size={18} color={COLORS.red} style={styles.actionIcon} />
-          <Text style={styles.deleteButtonText}>{STRINGS.delete}</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.white,
-    marginVertical: 12,
+    backgroundColor: '#FFFFFF',
+    marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 16,
-    overflow: 'hidden',
+    padding: 16,
     elevation: 4,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.gray[100],
-  },
-  header: {
-    flexDirection: 'row-reverse', // RTL: Name Right, Price Left
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    padding: 16,
-    paddingBottom: 12,
   },
   titleContainer: {
-    flex: 1,
-    marginLeft: 12,
+    marginBottom: 6,
+    alignItems: 'flex-end', // RTL
   },
   name: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    textAlign: 'right', // RTL
-    lineHeight: 24,
-  },
-  price: {
-    fontSize: 19,
-    fontWeight: '800',
-    color: COLORS.primary,
-    textAlign: 'left', // LTR for numbers
-    lineHeight: 24,
-  },
-  currency: {
-    fontSize: 13,
-    color: COLORS.text.secondary,
+    fontSize: 18,
     fontWeight: '600',
+    color: COLORS.text.primary,
+    textAlign: 'right',
+    lineHeight: 26,
   },
   description: {
     fontSize: 14,
-    color: COLORS.text.secondary,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    lineHeight: 22,
-    textAlign: 'right', // RTL
+    color: '#666666',
+    textAlign: 'right',
+    lineHeight: 20,
+    marginBottom: 16,
   },
   imageSection: {
-    marginBottom: 12,
+    marginBottom: 0, 
+    marginHorizontal: -16, 
   },
   imageContainer: {
     flexDirection: 'row-reverse',
@@ -131,70 +156,77 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   imageWrapper: {
-    marginLeft: 12,
+    width: 100,
+    height: 100,
     borderRadius: 12,
+    marginLeft: 8,
     overflow: 'hidden',
+    backgroundColor: COLORS.gray[50],
     borderWidth: 1,
-    borderColor: COLORS.gray[150],
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
+    borderColor: COLORS.gray[100],
   },
   image: {
-    width: 110,
-    height: 110,
+    width: '100%',
+    height: '100%',
   },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.gray[100],
-    marginHorizontal: 16,
-    marginBottom: 12,
+  priceContainer: {
+      alignItems: 'flex-end', // RTL alignment (Right)
+      marginTop: 12,
+      marginBottom: 16,
   },
-  actions: {
-    flexDirection: 'row-reverse', // Buttons flow from Right
-    padding: 12,
-    paddingTop: 0,
-    gap: 12,
+  price: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    textAlign: 'right',
   },
-  actionButton: {
-    flex: 1,
-    flexDirection: 'row', // Icon next to text
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
+  currency: {
+    fontSize: 14,
+    color: COLORS.text.secondary,
+    fontWeight: '500',
+  },
+  actionBar: {
+    flexDirection: 'row-reverse',
+    height: 52,
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginTop: 8,
   },
   editButton: {
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: COLORS.primaryLight,
+    flex: 1,
+    backgroundColor: 'rgba(98, 0, 234, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row', 
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: 'rgba(211, 47, 47, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  actionDivider: {
+      width: 1,
+      backgroundColor: '#FFFFFF',
   },
   editButtonText: {
     color: COLORS.primary,
-    fontWeight: '700',
-    fontSize: 14,
-    marginLeft: 6,
-  },
-  deleteButton: {
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: COLORS.red,
+    fontWeight: '600',
+    fontSize: 15,
+    marginLeft: 8, // RTL? Text is usually right of icon in LTR, left in RTL. "flexDirection: row" puts icon left, text right.
+    // If we want [Icon] [Text], row is correct.
+    // Ideally we want [Icon] [Text] centered.
   },
   deleteButtonText: {
-    color: COLORS.red,
-    fontWeight: '700',
-    fontSize: 14,
-    marginLeft: 6,
+    color: '#D32F2F',
+    fontWeight: '600',
+    fontSize: 15,
+    marginLeft: 8,
   },
   actionIcon: {
-    marginLeft: 6,
-  },
+      //
+  }
 });
+
 export default ProductCard;

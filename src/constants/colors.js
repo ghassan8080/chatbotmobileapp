@@ -64,13 +64,15 @@ export const COLORS = {
 
   // Input
   input: {
-    background: '#FFFFFF',
+    background: '#F5F6FA', // Light grey background
     border: '#E0E0E0',
     borderFocused: '#6200EA',
     placeholder: '#9E9E9E',
     focus: '#6200EA',
     error: '#D50000',
   },
+
+  surface: '#FFFFFF',
 
   // Border
   border: '#E0E0E0',

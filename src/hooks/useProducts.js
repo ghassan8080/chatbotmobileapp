@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../api/productApi';
 import { getProductsCache, storeProductsCache } from '../services/storageService';
 import { formatProductForDisplay } from '../utils/formatters';
+import { getErrorMessage } from '../services/errorHandler';
 
 export const useProducts = () => {
   const [products, setProducts] = useState([]);
@@ -72,7 +73,8 @@ export const useProducts = () => {
 
       setProducts(formattedProducts);
     } catch (err) {
-      setError(err.message || 'Failed to fetch products');
+      const errorMsg = getErrorMessage(err, 'useProducts:fetchProducts');
+      setError(errorMsg);
       console.error('Error in fetchProducts:', err);
     } finally {
       setLoading(false);
@@ -95,8 +97,9 @@ export const useProducts = () => {
 
       return result;
     } catch (err) {
-      setError(err.message || 'Failed to add product');
-      throw err;
+      const errorMsg = getErrorMessage(err, 'useProducts:addNewProduct');
+      setError(errorMsg);
+      throw err; // Re-throw for UI handling
     } finally {
       setLoading(false);
     }
@@ -117,7 +120,8 @@ export const useProducts = () => {
 
       return result;
     } catch (err) {
-      setError(err.message || 'Failed to update product');
+      const errorMsg = getErrorMessage(err, 'useProducts:updateExistingProduct');
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -139,7 +143,8 @@ export const useProducts = () => {
 
       return result;
     } catch (err) {
-      setError(err.message || 'Failed to delete product');
+      const errorMsg = getErrorMessage(err, 'useProducts:removeProduct');
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);

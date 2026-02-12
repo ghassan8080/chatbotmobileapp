@@ -125,7 +125,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         {/* Content Card */}
         <View style={styles.contentContainer}>
           <Text style={styles.name}>{product.name}</Text>
-
+          
           {/* Price Badge */}
           <View style={styles.priceContainer}>
             <View style={styles.priceIconContainer}>
@@ -133,7 +133,15 @@ const ProductDetailScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.priceTextContainer}>
               <Text style={styles.priceLabel}>{STRINGS.price}</Text>
-              <Text style={styles.price}>{product.price} <Text style={styles.currency}>د.ع</Text></Text>
+              <Text style={styles.price}>
+                {(() => {
+                  if (!product.price) return '0';
+                  const cleanPrice = String(product.price).replace(/[^0-9.]/g, '');
+                  const numericPrice = Number(cleanPrice);
+                  return isNaN(numericPrice) ? '0' : Math.floor(numericPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                })()} 
+                <Text style={styles.currency}> د.ع</Text>
+              </Text>
             </View>
           </View>
 

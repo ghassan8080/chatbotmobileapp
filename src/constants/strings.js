@@ -85,7 +85,7 @@ loadingOrders: 'جاري تحميل الطلبات...',
   imagePreview: 'معاينة الصورة',
 
   // Currency
-  currency: 'دينار',
+  currency: 'د.ع',
 
   // Empty States
   noProductsFound: 'لم يتم العثور على منتجات',
