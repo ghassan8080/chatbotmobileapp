@@ -116,25 +116,36 @@ const ProductFormScreen = ({ route, navigation }) => {
   };
 
   const handleCancel = () => {
-    if (isEditMode || (formData.name || formData.description || formData.price || images.length > 0)) {
-      Alert.alert(
-        STRINGS.areYouSure,
-        STRINGS.areYouSure,
-        [
-          {
-            text: STRINGS.cancel,
-            style: 'cancel',
-          },
-          {
-            text: STRINGS.confirm,
-            onPress: () => {
-              clearImages();
-              navigation.goBack();
+    // Check if there are unsaved changes
+    const hasUnsavedChanges = isEditMode || (formData.name || formData.description || formData.price || images.length > 0);
+
+    if (hasUnsavedChanges) {
+      if (Platform.OS === 'web') {
+        const confirm = window.confirm(STRINGS.areYouSure);
+        if (confirm) {
+          clearImages();
+          navigation.goBack();
+        }
+      } else {
+        Alert.alert(
+          STRINGS.areYouSure,
+          STRINGS.areYouSure,
+          [
+            {
+              text: STRINGS.cancel,
+              style: 'cancel',
             },
-          },
-        ],
-        { cancelable: true }
-      );
+            {
+              text: STRINGS.confirm,
+              onPress: () => {
+                clearImages();
+                navigation.goBack();
+              },
+            },
+          ],
+          { cancelable: true }
+        );
+      }
     } else {
       navigation.goBack();
     }
@@ -150,7 +161,7 @@ const ProductFormScreen = ({ route, navigation }) => {
         title={isEditMode ? STRINGS.editProduct : STRINGS.addNewProduct}
         backgroundColor={COLORS.primary}
         leftAction={{
-          icon: 'arrow-forward',
+          icon: 'arrow-back',
           onPress: handleCancel,
         }}
       />
