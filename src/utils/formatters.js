@@ -96,11 +96,11 @@ export const formatProductForDisplay = (product) => {
 
   // Check if images array already exists and is valid
   if (Array.isArray(product.images) && product.images.length > 0) {
-    images.push(...product.images);
-  } 
+    images.push(...product.images.map(img => typeof img === 'string' ? img.replace(/\s/g, '') : img));
+  }
   // Check if single image property exists
   else if (product.image) {
-    images.push(product.image);
+    images.push(typeof product.image === 'string' ? product.image.replace(/\s/g, '') : product.image);
   }
   // Fallback to checking individual image_url_x fields
   else {
@@ -108,7 +108,8 @@ export const formatProductForDisplay = (product) => {
     for (let i = 1; i <= 4; i++) {
       const imageField = `image_url_${i}`;
       if (product[imageField]) {
-        images.push(product[imageField]);
+        const val = product[imageField];
+        images.push(typeof val === 'string' ? val.replace(/\s/g, '') : val);
       }
     }
   }

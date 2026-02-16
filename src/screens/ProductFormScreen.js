@@ -28,7 +28,7 @@ const ProductFormScreen = ({ route, navigation }) => {
   const isEditMode = !!product;
 
   const { addNewProduct, updateExistingProduct, loading } = useProducts();
-  const { images, pickImage, addImage, removeImage, clearImages, uploading, prepareImagesForUpload } = useImageUpload();
+  const { images, pickImage, addImage, removeImage, clearImages, uploading, prepareImagesForUpload, setImages } = useImageUpload();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -46,8 +46,18 @@ const ProductFormScreen = ({ route, navigation }) => {
         description: product.description || '',
         price: product.price ? product.price.toString().replace(/[^\d.]/g, '') : '',
       });
+
+      // Initialize images if they exist
+      if (product.images && product.images.length > 0) {
+        setImages(product.images.map(url => ({
+          uri: url,
+          type: 'image/jpeg', // Default type
+          name: url.split('/').pop(), // Extract filename from URL
+          isExisting: true // Flag to identify existing images
+        })));
+      }
     }
-  }, [isEditMode, product]);
+  }, [isEditMode, product, setImages]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -84,12 +94,56 @@ const ProductFormScreen = ({ route, navigation }) => {
     try {
       setSubmitting(true);
 
-      let base64Images = [];
-      if (images.length > 0) {
-        base64Images = await prepareImagesForUpload();
+      setSubmitting(true);
+
+      let imagePayload = [];
+      const imagesToUpload = [];
+      const existingImages = [];
+
+      // Separate existing images from new uploads
+      images.forEach(img => {
+        if (img.isExisting || (img.uri && img.uri.startsWith('http'))) {
+          existingImages.push(img);
+        } else {
+          imagesToUpload.push(img);
+        }
+      });
+
+      // Handle new uploads
+      if (imagesToUpload.length > 0) {
+        // We need to temporarily set images state to only new ones for prepareImagesForUpload to work efficiently 
+        // or we can manually convert them here. `prepareImagesForUpload` uses the `images` state.
+        // Since `prepareImagesForUpload` relies on state, using it might be tricky if mixed.
+        // Let's manually convert new images using the logic from `prepareImagesForUpload` 
+        // OR better, just iterate and convert.
+
+        const { uriToBase64 } = require('../utils/fileUtils');
+
+        for (const img of imagesToUpload) {
+          let base64 = img.base64;
+          if (!base64 && img.uri) {
+            base64 = await uriToBase64(img.uri);
+          }
+
+          if (base64 && !base64.startsWith('data:image')) {
+            const mimeType = img.type || 'image/jpeg';
+            base64 = `data:${mimeType};base64,${base64}`;
+          }
+
+          imagePayload.push({
+            base64: base64,
+            name: img.name
+          });
+        }
       }
 
-      const imagePayload = base64Images.map(img => ({ name: img.name, base64: img.base64 }));
+      // Handle existing images
+      existingImages.forEach(img => {
+        imagePayload.push({
+          fileName: img.uri, // API expects fileName for existing URL
+          base64: null
+        });
+      });
 
       const productData = {
         id: isEditMode ? product.id : undefined,

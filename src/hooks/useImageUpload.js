@@ -183,6 +183,9 @@ export const useImageUpload = () => {
     removeImage,
     clearImages,
     prepareImagesForUpload,
+    clearImages,
+    prepareImagesForUpload,
     replaceImage,
+    setImages, // Expose setImages for initialization
   };
 };
