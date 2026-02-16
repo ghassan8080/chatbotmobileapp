@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  Image, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
   Alert,
   Dimensions,
 } from 'react-native';
@@ -28,13 +28,23 @@ const ProductDetailScreen = ({ route, navigation }) => {
   const [activeDotIndex, setActiveDotIndex] = React.useState(0);
 
   // Collect all image URLs
-  const images = [];
-  for (let i = 1; i <= 4; i++) {
-    const imageField = `image_url_${i}`;
-    if (product[imageField]) {
-      images.push(product[imageField]);
+  // Collect all image URLs
+  let rawImages = [];
+  if (product.images && product.images.length > 0) {
+    rawImages = product.images;
+  } else {
+    for (let i = 1; i <= 4; i++) {
+      const imageField = `image_url_${i}`;
+      if (product[imageField]) {
+        rawImages.push(product[imageField]);
+      }
     }
   }
+
+  // Sanitize images
+  const images = rawImages
+    .map(img => typeof img === 'string' ? img.replace(/\s/g, '') : img)
+    .filter(img => img && typeof img === 'string' && img.length > 0);
 
   const handleEdit = () => {
     navigation.navigate('ProductForm', { product });
@@ -125,7 +135,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         {/* Content Card */}
         <View style={styles.contentContainer}>
           <Text style={styles.name}>{product.name}</Text>
-          
+
           {/* Price Badge */}
           <View style={styles.priceContainer}>
             <View style={styles.priceIconContainer}>
@@ -139,7 +149,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
                   const cleanPrice = String(product.price).replace(/[^0-9.]/g, '');
                   const numericPrice = Number(cleanPrice);
                   return isNaN(numericPrice) ? '0' : Math.floor(numericPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                })()} 
+                })()}
                 <Text style={styles.currency}> د.ع</Text>
               </Text>
             </View>
