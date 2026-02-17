@@ -72,6 +72,17 @@ export const formatFileSize = (bytes) => {
 };
 
 /**
+ * Sanitize image URL by removing whitespace, newlines, and carriage returns
+ * @param {string} url - URL to sanitize
+ * @returns {string} Sanitized URL
+ */
+export const sanitizeImageUrl = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  // Remove all whitespace characters including newlines, carriage returns, tabs
+  return url.replace(/\s+/g, '').trim();
+};
+
+/**
  * Format image URL with size parameters
  * @param {string} url - Original image URL
  * @param {number} width - Desired width
@@ -96,11 +107,11 @@ export const formatProductForDisplay = (product) => {
 
   // Check if images array already exists and is valid
   if (Array.isArray(product.images) && product.images.length > 0) {
-    images.push(...product.images.map(img => typeof img === 'string' ? img.replace(/\s/g, '') : img));
+    images.push(...product.images.map(img => typeof img === 'string' ? sanitizeImageUrl(img) : img));
   }
   // Check if single image property exists
   else if (product.image) {
-    images.push(typeof product.image === 'string' ? product.image.replace(/\s/g, '') : product.image);
+    images.push(typeof product.image === 'string' ? sanitizeImageUrl(product.image) : product.image);
   }
   // Fallback to checking individual image_url_x fields
   else {
@@ -109,7 +120,7 @@ export const formatProductForDisplay = (product) => {
       const imageField = `image_url_${i}`;
       if (product[imageField]) {
         const val = product[imageField];
-        images.push(typeof val === 'string' ? val.replace(/\s/g, '') : val);
+        images.push(typeof val === 'string' ? sanitizeImageUrl(val) : val);
       }
     }
   }

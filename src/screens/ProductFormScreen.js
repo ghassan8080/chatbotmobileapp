@@ -3,7 +3,7 @@
  * Screen for adding or editing a product
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -22,6 +22,7 @@ import AppButton from '../components/AppButton';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import { validateProductForm } from '../utils/validators';
+import { sanitizeImageUrl } from '../utils/formatters';
 
 const ProductFormScreen = ({ route, navigation }) => {
   const { product } = route.params || {};
@@ -38,6 +39,7 @@ const ProductFormScreen = ({ route, navigation }) => {
 
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const imagesInitialized = useRef(false);
 
   useEffect(() => {
     if (isEditMode && product) {
@@ -47,14 +49,29 @@ const ProductFormScreen = ({ route, navigation }) => {
         price: product.price ? product.price.toString().replace(/[^\d.]/g, '') : '',
       });
 
-      // Initialize images if they exist
-      if (product.images && product.images.length > 0) {
-        setImages(product.images.map(url => ({
-          uri: url,
-          type: 'image/jpeg', // Default type
-          name: url.split('/').pop(), // Extract filename from URL
-          isExisting: true // Flag to identify existing images
-        })));
+      // Initialize images only once to prevent re-initialization and duplication
+      if (product.images && product.images.length > 0 && !imagesInitialized.current) {
+        const sanitizedImages = product.images
+          .map(url => sanitizeImageUrl(url)) // Clean URLs
+          .filter(url => {
+            // Filter out invalid images:
+            // - Empty strings
+            // - Non-HTTP/HTTPS URLs
+            // - Very short strings (likely corrupt)
+            return url &&
+              url.length > 10 &&
+              (url.startsWith('http://') || url.startsWith('https://'));
+          })
+          .map(cleanUrl => ({
+            uri: cleanUrl,
+            type: 'image/jpeg', // Default type
+            name: cleanUrl.split('/').pop(), // Extract filename from URL
+            isExisting: true // Flag to identify existing images
+          }));
+
+        console.log('Filtered images from product:', sanitizedImages.length, 'out of', product.images.length);
+        setImages(sanitizedImages);
+        imagesInitialized.current = true;
       }
     }
   }, [isEditMode, product, setImages]);
@@ -76,6 +93,12 @@ const ProductFormScreen = ({ route, navigation }) => {
   const handleAddImage = async (source) => {
     const file = await pickImage(source);
     if (file) {
+      console.log('Adding new image:', {
+        uri: file.uri?.substring(0, 50) + '...',
+        type: file.type,
+        name: file.name,
+        isExisting: file.isExisting
+      });
       addImage(file);
     }
   };
@@ -99,15 +122,41 @@ const ProductFormScreen = ({ route, navigation }) => {
       let imagePayload = [];
       const imagesToUpload = [];
       const existingImages = [];
+      const seenUrls = new Set(); // Track URLs to prevent duplicates
 
       // Separate existing images from new uploads
+      console.log('=== IMAGE CLASSIFICATION DEBUG ===');
+      console.log('Total images in state:', images.length);
+      images.forEach((img, idx) => {
+        console.log(`Image ${idx}:`, {
+          uri: img.uri?.substring(0, 50) + '...',
+          isExisting: img.isExisting,
+          hasHttpUrl: img.uri?.startsWith('http://') || img.uri?.startsWith('https://'),
+          type: img.type,
+          name: img.name
+        });
+      });
+
       images.forEach(img => {
-        if (img.isExisting || (img.uri && img.uri.startsWith('http'))) {
-          existingImages.push(img);
+        // Existing images have isExisting flag OR HTTP/HTTPS URLs
+        if (img.isExisting || (img.uri && (img.uri.startsWith('http://') || img.uri.startsWith('https://')))) {
+          // Prevent duplicate URLs
+          const cleanUrl = sanitizeImageUrl(img.uri);
+          if (!seenUrls.has(cleanUrl)) {
+            existingImages.push({ ...img, uri: cleanUrl });
+            seenUrls.add(cleanUrl);
+            console.log('Classified as EXISTING:', cleanUrl.substring(0, 50) + '...');
+          } else {
+            console.log('DUPLICATE DETECTED, skipping:', cleanUrl.substring(0, 50) + '...');
+          }
         } else {
+          // New images have local URIs (file://, content://, etc.)
           imagesToUpload.push(img);
+          console.log('Classified as NEW:', img.uri?.substring(0, 50) + '...');
         }
       });
+
+      console.log('Image separation - Existing:', existingImages.length, 'New:', imagesToUpload.length);
 
       // Handle new uploads
       if (imagesToUpload.length > 0) {
@@ -120,16 +169,21 @@ const ProductFormScreen = ({ route, navigation }) => {
         const { uriToBase64 } = require('../utils/fileUtils');
 
         for (const img of imagesToUpload) {
+          console.log('Processing new image for upload:', img.name);
           let base64 = img.base64;
           if (!base64 && img.uri) {
+            console.log('Converting URI to base64...');
             base64 = await uriToBase64(img.uri);
+            console.log('Conversion result - has data:', !!base64, 'length:', base64?.length);
           }
 
           if (base64 && !base64.startsWith('data:image')) {
             const mimeType = img.type || 'image/jpeg';
             base64 = `data:${mimeType};base64,${base64}`;
+            console.log('Added data URL prefix');
           }
 
+          console.log('Final base64 for', img.name, '- length:', base64?.length);
           imagePayload.push({
             base64: base64,
             name: img.name
@@ -137,11 +191,26 @@ const ProductFormScreen = ({ route, navigation }) => {
         }
       }
 
-      // Handle existing images
+      // Handle existing images - send URLs as fileName with null base64
       existingImages.forEach(img => {
-        imagePayload.push({
-          fileName: img.uri, // API expects fileName for existing URL
-          base64: null
+        const cleanUrl = sanitizeImageUrl(img.uri);
+        if (cleanUrl && (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://'))) {
+          imagePayload.push({
+            fileName: cleanUrl, // API expects fileName for existing URL
+            base64: null
+          });
+          console.log('Added to payload as EXISTING URL:', cleanUrl.substring(0, 50) + '...');
+        }
+      });
+
+      console.log('=== FINAL PAYLOAD ===');
+      console.log('Total images in payload:', imagePayload.length);
+      imagePayload.forEach((img, idx) => {
+        console.log(`Payload image ${idx}:`, {
+          hasBase64: !!img.base64,
+          base64Length: img.base64?.length,
+          fileName: img.fileName?.substring(0, 50) + '...',
+          name: img.name
         });
       });
 
