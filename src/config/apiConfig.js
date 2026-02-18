@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
   
   // Webhooks
   CONFIRM_BOOKING_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/confirm-booking',
+  DELETE_ORDER_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/delete-order',
 };
 
 // API Request Configuration

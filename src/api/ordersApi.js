@@ -22,16 +22,16 @@ export const getOrders = async () => {
 
     // Build URL with user_id query parameter for multi-tenant filtering
     const url = `${API_ENDPOINTS.ORDERS}?user_id=${userId}`;
-    
+
     console.log('📥 Fetching orders with URL:', url);
-    
+
     // Use GET to fetch orders
     const response = await apiClient.get(url);
-    
+
     const data = response.data;
-    
+
     console.log('📥 Raw response from GET /orders:', data);
-    
+
     // Handle both response formats:
     // 1. { success: true, count: X, orders: [...] }
     // 2. Direct array [...]
@@ -45,7 +45,7 @@ export const getOrders = async () => {
       console.log('✅ Response has orders in success object, items:', data.orders.length);
       return data.orders;
     }
-    
+
     // Return empty array if no orders found
     console.log('⚠️ No orders found in response');
     return [];
@@ -68,11 +68,11 @@ export const getOrderById = async (orderId) => {
     }
 
     const url = `${API_ENDPOINTS.ORDERS}/${orderId}?user_id=${userId}`;
-    
+
     console.log('📥 Fetching order:', url);
-    
+
     const response = await apiClient.get(url);
-    
+
     return response.data;
   } catch (error) {
     console.error('Error fetching order:', error);
@@ -144,15 +144,57 @@ export const confirmBooking = async (orderId) => {
     if (!response.ok) {
       throw new Error(`Webhook failed: ${response.statusText}`);
     }
-    
+
     // Check if response has content before parsing JSON
     const text = await response.text();
     const data = text ? JSON.parse(text) : { success: true };
-    
+
     console.log('✅ Booking confirmed via webhook:', data);
     return data;
   } catch (error) {
     console.error('Error confirming booking:', error);
     throw new Error(error.message || 'Failed to confirm booking');
+  }
+};
+
+/**
+ * Delete an order via webhook
+ * @param {string} orderId - Order ID to delete
+ * @returns {Promise<Object>} Response from webhook
+ */
+export const deleteOrder = async (orderId) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const payload = {
+      order_id: orderId,
+      user_id: userId,
+    };
+
+    console.log('📤 Deleting order via webhook:', payload);
+
+    const response = await fetch(API_ENDPOINTS.DELETE_ORDER_WEBHOOK, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Delete webhook failed: ${response.statusText}`);
+    }
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : { success: true };
+
+    console.log('✅ Order deleted via webhook:', data);
+    return data;
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    throw new Error(error.message || 'Failed to delete order');
   }
 };

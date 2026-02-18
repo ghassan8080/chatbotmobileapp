@@ -12,19 +12,20 @@ import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import OrderCard from '../components/OrderCard';
 import { useOrders } from '../hooks/useOrders';
-import { updateOrderStatus, confirmBooking } from '../api/ordersApi';
+import { updateOrderStatus, confirmBooking, deleteOrder } from '../api/ordersApi';
 import { AuthContext } from '../context/AuthContext';
 
 const OrdersListScreen = ({ navigation }) => {
   const { orders, loading, refreshing, onRefresh, error, fetchOrders } = useOrders();
   const { logout } = useContext(AuthContext);
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
+  const [deletingOrderId, setDeletingOrderId] = useState(null);
 
   const handleLogout = async () => {
     console.log('🔴 LOGOUT BUTTON CLICKED - Showing confirmation dialog');
-    
+
     const confirmed = window.confirm('هل تريد تسجيل الخروج؟');
-    
+
     if (confirmed) {
       console.log('🟡 User confirmed logout - calling logout()...');
       try {
@@ -65,6 +66,28 @@ const OrdersListScreen = ({ navigation }) => {
     }
   };
 
+  /**
+   * Handle delete order
+   * Optimistically removes the order then calls the delete webhook
+   */
+  const handleDeleteOrder = async (orderId) => {
+    if (deletingOrderId) return;
+    setDeletingOrderId(orderId);
+    try {
+      console.log(`🗑️ Deleting order ${orderId} via webhook`);
+      const result = await deleteOrder(orderId);
+      console.log('✅ Order deleted via webhook:', result);
+      alert('تم حذف الطلب بنجاح');
+      await fetchOrders();
+    } catch (err) {
+      console.error('❌ Error deleting order:', err);
+      alert('خطأ: ' + (err.message || 'فشل حذف الطلب'));
+      await fetchOrders();
+    } finally {
+      setDeletingOrderId(null);
+    }
+  };
+
   const renderItem = ({ item }) => (
     <OrderCard
       order={item}
@@ -72,6 +95,7 @@ const OrdersListScreen = ({ navigation }) => {
         console.log('Order tapped:', item);
       }}
       onConfirmOrder={handleConfirmOrder}
+      onDeleteOrder={handleDeleteOrder}
     />
   );
 
