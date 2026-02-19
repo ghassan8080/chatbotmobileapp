@@ -43,7 +43,17 @@ const OrderCard = ({ order, onPress, onConfirmOrder, onDeleteOrder }) => {
   };
 
   // Extract key order information
-  const orderId = order.id || order._id || 'N/A';
+  // 🔍 DEBUG: Log raw order object to reveal the actual field names from the API
+  console.log('🔍 Raw order object fields:', JSON.stringify(order, null, 2));
+
+  // Use timestamp as the unique order identifier.
+  // ⚠️ senderId is the WhatsApp sender ID — it's the SAME for all orders from one user, NOT unique per order.
+  // timestamp IS unique per row (each order has a different creation time).
+  const orderId = order.timestamp || order.id || order._id || 'N/A';
+  console.log('🆔 Resolved orderId for this card:', orderId, '| Source field:',
+    order.timestamp ? 'timestamp' :
+      order.id ? 'id' :
+        order._id ? '_id' : 'NONE - check API response!');
   const productName = order.product_name || order.selectedProduct || 'منتج غير محدد';
   const phoneNumber = order.phone || 'N/A';
   const deliveryAddress = order.delivery_address || order.address || 'N/A';

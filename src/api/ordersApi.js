@@ -174,7 +174,14 @@ export const deleteOrder = async (orderId) => {
       user_id: userId,
     };
 
-    console.log('📤 Deleting order via webhook:', payload);
+    // 🔍 DEBUG: Log all values before sending the delete request
+    console.log('🗑️ Deleting order with data:', {
+      order_id: orderId,
+      user_id: userId,
+      full_payload: payload,
+    });
+    console.log('🌐 Sending DELETE request to:', API_ENDPOINTS.DELETE_ORDER_WEBHOOK);
+    console.log('📦 Request body (stringified):', JSON.stringify(payload));
 
     const response = await fetch(API_ENDPOINTS.DELETE_ORDER_WEBHOOK, {
       method: 'POST',
@@ -184,6 +191,13 @@ export const deleteOrder = async (orderId) => {
       body: JSON.stringify(payload),
     });
 
+    // 🔍 DEBUG: Log the raw response details
+    console.log('✅ Delete response:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+    });
+
     if (!response.ok) {
       throw new Error(`Delete webhook failed: ${response.statusText}`);
     }
@@ -191,7 +205,11 @@ export const deleteOrder = async (orderId) => {
     const text = await response.text();
     const data = text ? JSON.parse(text) : { success: true };
 
-    console.log('✅ Order deleted via webhook:', data);
+    // 🔍 DEBUG: Log the parsed response data
+    console.log('✅ Delete response data:', {
+      status: response.status,
+      data: data,
+    });
     return data;
   } catch (error) {
     console.error('Error deleting order:', error);
