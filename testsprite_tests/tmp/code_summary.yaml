@@ -1,99 +1,87 @@
 version: "2"
 type: frontend
 tech_stack:
-  - React Native
-  - Expo
-  - Axios
-  - AsyncStorage
+  - react-native
+  - expo
+  - react-navigation
 routes:
-  - path: Login
+  - path: /login
     file: src/screens/LoginScreen.js
     auth_required: false
     description: User login page
-  - path: Products
+  - path: /product-list
     file: src/screens/ProductListScreen.js
     auth_required: true
-    description: List of products
-  - path: ProductDetail
-    file: src/screens/ProductDetailScreen.js
-    auth_required: true
-    description: Product detail view
-  - path: ProductForm
+    description: Main product listing page
+  - path: /product-form
     file: src/screens/ProductFormScreen.js
     auth_required: true
-    description: Create or edit a product
-  - path: Orders
+    description: Add or edit a product
+  - path: /product-detail
+    file: src/screens/ProductDetailScreen.js
+    auth_required: true
+    description: View product details
+  - path: /orders-list
     file: src/screens/OrdersListScreen.js
     auth_required: true
-    description: List of user orders
+    description: View and manage orders
 features:
   - name: User Login
-    description: Login with email/phone and password credentials
+    description: Login with email and password credentials
     files:
       - src/screens/LoginScreen.js
-      - src/context/AuthContext.js
-    entry_route: Login
+      - src/api/authApi.js
+    entry_route: /login
     user_interactions:
-      - Fill login input field
+      - Fill email input field
       - Fill password input field
       - Click Login button to submit
+      - See error message on invalid credentials
     api_calls:
       - method: POST
-        endpoint: /login
+        endpoint: /api/auth/login
     auth_required: false
-  - name: View Products
-    description: View product list
+  - name: Product Management
+    description: View, add, edit, or delete products with image upload
     files:
       - src/screens/ProductListScreen.js
-      - src/hooks/useProducts.js
-    entry_route: Products
+      - src/screens/ProductFormScreen.js
+      - src/screens/ProductDetailScreen.js
+      - src/api/productApi.js
+      - src/api/uploadApi.js
+    entry_route: /product-list
     user_interactions:
-      - Load products
-      - See products in list
+      - View list of products
+      - Pull to refresh products
+      - Click to view product details
+      - Click Add Product to open form
+      - Fill product details and upload image
+      - Click Submit to create/update product
+      - Click Delete to remove product
     api_calls:
       - method: GET
-        endpoint: /products
-    auth_required: true
-  - name: Create or Edit Product
-    description: Add a new product or edit an existing one
-    files:
-      - src/screens/ProductFormScreen.js
-    entry_route: ProductForm
-    user_interactions:
-      - Fill product details
-      - Add images
-      - Submit form
-    api_calls:
+        endpoint: /api/products
       - method: POST
-        endpoint: /add-product
-      - method: POST
-        endpoint: /update-product
+        endpoint: /api/products
+      - method: PUT
+        endpoint: /api/products
+      - method: DELETE
+        endpoint: /api/products
     auth_required: true
-  - name: Delete Product
-    description: Delete a specific product
-    files:
-      - src/screens/ProductListScreen.js
-      - src/screens/ProductDetailScreen.js
-    entry_route: Products
-    user_interactions:
-      - Click Delete button on a product
-      - Confirm deletion
-    api_calls:
-      - method: POST
-        endpoint: /delete-product
-    auth_required: true
-  - name: Manage Orders
-    description: View and confirm/delete orders
+  - name: Order Management
+    description: View order list and confirm or delete orders
     files:
       - src/screens/OrdersListScreen.js
-    entry_route: Orders
+      - src/api/ordersApi.js
+    entry_route: /orders-list
     user_interactions:
       - View list of orders
-      - Click confirm order webhook
-      - Click delete order webhook
+      - Pull to refresh orders
+      - Click Confirm order
+      - Click Delete order
     api_calls:
       - method: GET
-        endpoint: /orders
+        endpoint: /api/orders
       - method: POST
         endpoint: /webhook/confirm-booking
       - method: POST

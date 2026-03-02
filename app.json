@@ -9,7 +9,7 @@
     "sdkVersion": "51.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "auto",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -52,8 +52,7 @@
             "android.intent.category.LAUNCHER"
           ]
         }
-      ],
-      "usesCleartextTraffic": false
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -73,7 +72,6 @@
       }
     },
     "description": "Product management application for sellers to manage their product inventory and orders",
-    "privacy": "https://tekamul.link/privacy",
     "githubUrl": "https://github.com/ghassan8080/chatbotmobileapp"
   }
 }
