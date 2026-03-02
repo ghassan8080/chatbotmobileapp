@@ -6,6 +6,7 @@
     "runtimeVersion": {
       "policy": "appVersion"
     },
+    "sdkVersion": "51.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "auto",
@@ -75,7 +76,7 @@
       }
     },
     "description": "Product management application for sellers to manage their product inventory and orders",
-    "privacy": "https://example.com/privacy-policy",
+    "privacy": "https://tekamul.link/privacy",
     "githubUrl": "https://github.com/ghassan8080/chatbotmobileapp"
   }
 }
