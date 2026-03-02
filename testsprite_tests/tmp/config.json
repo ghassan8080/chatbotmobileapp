@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:19006",
+  "loginUser": "gh1assan@gmail.com",
+  "loginPassword": "654321",
+  "executionArgs": {
+    "projectName": "chatbotmobileapp-main",
+    "projectPath": "d:\\chatbotmobileapp-main\\chatbotmobileapp-main",
+    "testIds": [],
+    "additionalInstruction": "",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-1U91ckSmeTTNrU6UGbbBKTFDSPHCAIngybeHnR9N1RdxMJ2uIw74B3THaHcGOYVe9FYKcGhZduX1Z1lb0Wk2WgzToql1Cadi-l7r45ymI0IBn5zSzsO3y_ayGlmgEnz20Qw"
+    }
+  },
+  "serverPort": 57246,
+  "proxy": "http://83fa53da-b997-4c7f-80ae-bbac56f2add9:5YKbdM2A2dIORu4Gh4oXu1SUjjQb02MZ@tun.testsprite.com:8080"
+}

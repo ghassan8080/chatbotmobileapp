@@ -1,0 +1,933 @@
+[
+  {
+    "id": "TC001",
+    "title": "Successful login routes user to Products screen",
+    "description": "Verifies a user can log in with valid credentials and land on the Products screen.",
+    "category": "User Login",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"{{LOGIN_USER}}\" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"{{LOGIN_PASSWORD}}\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Products\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Invalid password shows error and remains on Login",
+    "description": "Verifies an invalid password shows an \"Invalid credentials\" message and the user stays on the Login screen.",
+    "category": "User Login",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"fake.user@example.com\" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"WrongPassword123!\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Invalid credentials\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Non-existent user shows Invalid credentials and stays on Login",
+    "description": "Verifies a non-existent account cannot log in and receives an \"Invalid credentials\" message.",
+    "category": "User Login",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"does.not.exist.999999@example.com\" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"SomePassword123!\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Invalid credentials\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Empty login input blocks submission and does not navigate to Products",
+    "description": "Verifies the app prevents login when the login identifier field is empty.",
+    "category": "User Login",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"\" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"SomePassword123!\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Products\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Empty password blocks submission and does not navigate to Products",
+    "description": "Verifies the app prevents login when the password field is empty.",
+    "category": "User Login",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"fake.user@example.com\" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Products\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Trimmed credentials: login works with leading/trailing spaces (if supported)",
+    "description": "Verifies entering credentials with leading/trailing spaces does not prevent successful login (common input handling).",
+    "category": "User Login",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"  {{LOGIN_USER}}  \" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"  {{LOGIN_PASSWORD}}  \" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Products\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Multiple rapid login attempts do not break navigation after a valid attempt",
+    "description": "Verifies repeated tapping of Login does not prevent a successful login from reaching Products.",
+    "category": "User Login",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"Login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"{{LOGIN_USER}}\" into the login input field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"{{LOGIN_PASSWORD}}\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Login\" button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Products\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "View products list and open a product detail",
+    "description": "Verifies an authenticated user can load the Products list and navigate to a ProductDetail screen from a list item.",
+    "category": "View Products",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first product in the products list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product detail\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Products list shows content after loading completes",
+    "description": "Verifies the Products screen displays a visible list after products load successfully.",
+    "category": "View Products",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Products\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Open ProductDetail and verify key detail content is shown",
+    "description": "Verifies that navigating from the Products list to ProductDetail shows visible detail content for the selected product.",
+    "category": "View Products",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Products\" in the main navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first product in the products list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product detail\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Product name\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Products screen remains usable after refresh (no stuck loading state)",
+    "description": "Verifies that after pull-to-refresh, the Products screen returns to a usable state with the list visible.",
+    "category": "View Products",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Products\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down to perform pull-to-refresh on the products list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "After successful create, show confirmation and navigate to Products",
+    "description": "Verifies that after a successful product creation, a visible success confirmation appears and the user can return to Products.",
+    "category": "Create or Edit Product",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add Product\" button"
+      },
+      {
+        "type": "action",
+        "description": "Fill product details"
+      },
+      {
+        "type": "action",
+        "description": "Submit form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"success\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Create product validation: missing required field shows error, then submit succeeds after fix",
+    "description": "Verifies client-side validation blocks submission when a required field is missing, then allows success after filling the missing field.",
+    "category": "Create or Edit Product",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add Product\" button"
+      },
+      {
+        "type": "action",
+        "description": "Fill product details (missing required field)"
+      },
+      {
+        "type": "action",
+        "description": "Submit form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Fix validation error by filling missing field, then submit and see success confirmation",
+    "description": "Verifies that after a validation error, the user can complete the missing field and successfully submit the form.",
+    "category": "Create or Edit Product",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add Product\" button"
+      },
+      {
+        "type": "action",
+        "description": "Fill product details (missing required field)"
+      },
+      {
+        "type": "action",
+        "description": "Submit form"
+      },
+      {
+        "type": "action",
+        "description": "Fill product details"
+      },
+      {
+        "type": "action",
+        "description": "Submit form"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Delete a product from Products list after confirming",
+    "description": "Verifies a user can delete a product from the Products list and it disappears after confirmation.",
+    "category": "Delete Product",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click Delete button on a product"
+      },
+      {
+        "type": "action",
+        "description": "Confirm deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Failed to delete product\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Cancel deletion from Products list keeps product in list",
+    "description": "Verifies cancelling the delete confirmation does not remove the product from the Products list.",
+    "category": "Delete Product",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click Delete button on a product"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Cancel\" button on the deletion confirmation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Delete a product from ProductDetail and handle failure message",
+    "description": "Verifies that if deletion fails from the ProductDetail screen, an error message is shown and the product is not removed.",
+    "category": "Delete Product",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on a product in the list to open its details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"ProductDetail\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click Delete button on a product"
+      },
+      {
+        "type": "action",
+        "description": "Confirm deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Failed to delete product\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Delete confirmation dialog appears when initiating delete from Products list",
+    "description": "Verifies that tapping delete prompts the user for confirmation before any removal occurs.",
+    "category": "Delete Product",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click Delete button on a product"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Confirm\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Cancel\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Deleting one product does not remove other products in the list",
+    "description": "Verifies that confirming deletion affects only the selected product and the list remains otherwise intact.",
+    "category": "Delete Product",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Delete\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click Delete button on a product"
+      },
+      {
+        "type": "action",
+        "description": "Confirm deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "User can still navigate and see Products list after a failed delete attempt",
+    "description": "Verifies the app remains usable after a delete failure and the user can still view the Products list with the product present.",
+    "category": "Delete Product",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username or email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on a product in the list to open its details"
+      },
+      {
+        "type": "action",
+        "description": "Click Delete button on a product"
+      },
+      {
+        "type": "action",
+        "description": "Confirm deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Failed to delete product\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the back button to return to the Products list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Products\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "View Orders list after login",
+    "description": "Verifies an authenticated user can open the Orders screen and see an orders list UI.",
+    "category": "Manage Orders",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username/email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Orders\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Orders\" in the app navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Orders\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"List of orders\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Orders list displays at least one recognizable order row layout",
+    "description": "Verifies the Orders list renders order rows with actionable controls (Confirm/Delete) visible to the user.",
+    "category": "Manage Orders",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username/email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Orders\" in the app navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"List of orders\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Confirm\" is visible for an order in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Delete\" is visible for an order in the list"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Orders screen supports scrolling to view more orders",
+    "description": "Verifies the user can scroll the Orders list and still see order actions available.",
+    "category": "Manage Orders",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to Login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the username/email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Orders\" in the app navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"List of orders\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the orders list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Confirm\" is visible for an order in view"
+      }
+    ]
+  }
+]
