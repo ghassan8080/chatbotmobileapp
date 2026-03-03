@@ -40,5 +40,5 @@ export const PRODUCT_FORM_CONFIG = {
   maxNameLength: 100,
   maxDescriptionLength: 500,
   minPrice: 0,
-  maxPrice: 999999,
+  maxPrice: 100000000,
 };
