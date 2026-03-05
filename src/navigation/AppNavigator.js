@@ -14,6 +14,8 @@ import ProductFormScreen from '../screens/ProductFormScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import OrdersListScreen from '../screens/OrdersListScreen';
 import LoginScreen from '../screens/LoginScreen';
+import RegistrationScreen from '../screens/RegistrationScreen';
+import PendingApprovalScreen from '../screens/PendingApprovalScreen';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -44,6 +46,8 @@ const AppNavigator = () => {
         {!user ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+            <Stack.Screen name="PendingApproval" component={PendingApprovalScreen} />
           </>
         ) : (
           <>
