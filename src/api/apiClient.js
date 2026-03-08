@@ -23,9 +23,11 @@ apiClient.interceptors.request.use(
       const token = await getUserToken();
       const userId = await getUserId();
 
-      // Allow unauthenticated calls to specific public endpoints (e.g. login)
+      // Allow unauthenticated calls to specific public endpoints (e.g. login, register)
       const urlLower = (config.url || '').toString().toLowerCase();
-      const isAuthEndpoint = urlLower.includes('/login') || urlLower.includes('/auth');
+      const isAuthEndpoint = urlLower.includes('/login') || 
+                            urlLower.includes('/auth') || 
+                            urlLower.includes('/register');
 
       // Prevent API calls if token is missing (except for auth endpoints)
       if (!token && !isAuthEndpoint) {

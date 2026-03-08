@@ -23,10 +23,11 @@ if (!API_BASE_URL) {
 // Environment variable: EXPO_PUBLIC_API_KEY
 // IMPORTANT: This should be a read-only API key with minimal permissions
 // Never commit production API keys to repository
+// Note: API_KEY is optional for public endpoints like registration
 export const API_KEY = process.env.EXPO_PUBLIC_API_KEY || null;
 
-if (!API_KEY) {
-  console.warn('⚠️ WARNING: EXPO_PUBLIC_API_KEY not configured. API calls will fail.');
+if (!API_KEY && process.env.EXPO_PUBLIC_ENVIRONMENT === 'production') {
+  console.warn('⚠️ WARNING: EXPO_PUBLIC_API_KEY not configured in production.');
 }
 
 // API Timeout Configuration

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +17,8 @@ const RegistrationScreen = () => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -109,44 +110,34 @@ const RegistrationScreen = () => {
       console.log('Registration response data:', response.data);
 
       // Check for success - accept either success: true or status: 'success' or HTTP 200-299
-      const isSuccess = response.data?.success === true || 
+      const isSuccess = response.data?.success === true ||
                        response.data?.status === 'success' ||
                        (response.status >= 200 && response.status < 300);
 
       if (isSuccess) {
-        const successMessage = response.data?.message || 'تم إنشاء حساب بنجاح';
+        const successMessage = response.data?.message || 'تم التسجيل بنجاح! انتظر الموافقة من الإدارة';
 
-        Alert.alert(
-          'نجاح',
-          successMessage,
-          [
-            {
-              text: 'حسناً',
-              onPress: () => {
-                // Clear form
-                setName('');
-                setEmail('');
-                setPassword('');
-                setStoreName('');
-                setPhone('');
-                setErrors({});
+        // Clear form fields
+        setName('');
+        setEmail('');
+        setPassword('');
+        setStoreName('');
+        setPhone('');
+        setErrors({});
 
-                // Navigate to PendingApproval screen
-                navigation.navigate('PendingApproval', { 
-                  email: email.trim(),
-                  name: name.trim()
-                });
-              },
-            },
-          ],
-          { cancelable: false }
-        );
+        // Show success message
+        setSuccessMessage(successMessage);
+
+        // Navigate to Login screen after 2 seconds
+        setTimeout(() => {
+          navigation.navigate('Login');
+        }, 2000);
       } else {
         // Handle case where request succeeded but API returned an error
-        const errorMessage = response.data?.message || 
-                           response.data?.error || 
+        const errorMessage = response.data?.message ||
+                           response.data?.error ||
                            'فشل التسجيل. يرجى المحاولة مرة أخرى.';
-        Alert.alert('خطأ', errorMessage);
+        setErrorMessage(errorMessage);
       }
     } catch (err) {
       console.error('Registration error details:', {
@@ -159,8 +150,8 @@ const RegistrationScreen = () => {
 
       if (err.response) {
         // Server responded with error
-        errorMessage = err.response.data?.message || 
-                      err.response.data?.error || 
+        errorMessage = err.response.data?.message ||
+                      err.response.data?.error ||
                       err.response.data?.details ||
                       `خطأ في الخادم: ${err.response.status}`;
       } else if (err.request) {
@@ -171,7 +162,7 @@ const RegistrationScreen = () => {
         errorMessage = err.message || errorMessage;
       }
 
-      Alert.alert('خطأ', errorMessage);
+      setErrorMessage(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -205,6 +196,20 @@ const RegistrationScreen = () => {
             },
           ]}
         >
+          {/* Success Message */}
+          {successMessage ? (
+            <View style={styles.messageContainer}>
+              <Text style={styles.successText}>{successMessage}</Text>
+            </View>
+          ) : null}
+
+          {/* Error Message */}
+          {errorMessage ? (
+            <View style={styles.messageContainer}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          ) : null}
+
           <AppInput
             label="الاسم الكامل"
             value={name}
@@ -352,6 +357,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.12,
     shadowRadius: 12,
+  },
+  messageContainer: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  successText: {
+    color: '#4CAF50',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  errorText: {
+    color: '#F44336',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   buttonWrapper: {
     marginTop: 8,
