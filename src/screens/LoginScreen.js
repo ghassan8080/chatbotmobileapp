@@ -1,5 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
@@ -7,6 +8,7 @@ import AppInput from '../components/AppInput';
 import AppButton from '../components/AppButton';
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,7 +52,14 @@ const LoginScreen = () => {
       console.log('Login successful');
     } catch (err) {
       console.error('Login failed in screen:', err);
-      setErrors({ general: err.message || 'Login failed' });
+      const errorMessage = err.response?.data?.error || err.message || 'Login failed';
+
+      // Check if the error indicates pending approval
+      if (errorMessage.includes('قيد المراجعة') || errorMessage.toLowerCase().includes('pending')) {
+        navigation.navigate('PendingApproval', { email });
+      } else {
+        setErrors({ general: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -127,6 +136,16 @@ const LoginScreen = () => {
               icon={loading ? undefined : 'log-in-outline'}
               iconPosition="right"
             />
+          </View>
+
+          <View style={styles.registerLinkContainer}>
+            <Text style={styles.registerLinkText}>حساب جديد؟ </Text>
+            <Text
+              style={styles.registerLink}
+              onPress={() => navigation.navigate('Registration')}
+            >
+              سجّل الآن
+            </Text>
           </View>
         </Animated.View>
       </ScrollView>
@@ -206,6 +225,21 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginTop: 8,
+  },
+  registerLinkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  registerLinkText: {
+    fontSize: 14,
+    color: COLORS.text.secondary,
+  },
+  registerLink: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: '600',
   },
 });
 
