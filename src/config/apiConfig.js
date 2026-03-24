@@ -92,7 +92,7 @@ export const MULTI_TENANT_ENABLED = process.env.EXPO_PUBLIC_MULTI_TENANT_ENABLED
 export const IMAGE_UPLOAD_CONFIG = {
   maxImages: 4,
   maxImageSize: 5 * 1024 * 1024, // 5MB
-  allowedTypes: ['image/jpeg', 'image/png', 'image/jpg'],
+  allowedTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'],
   quality: 0.8, // Compression quality
 };
 

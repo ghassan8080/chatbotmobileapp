@@ -110,7 +110,13 @@ const ProductFormScreen = ({ route, navigation }) => {
     });
 
     if (!validation.isValid) {
+      console.error('Form validation failed:', validation.errors);
       setErrors(validation.errors);
+      
+      // Show an alert with the validation errors so the user isn't stuck silently
+      const errorMessages = Object.values(validation.errors).join('\n');
+      Alert.alert(STRINGS.error || 'خطأ', errorMessages || 'الرجاء التحقق من المدخلات.');
+      
       return;
     }
 
@@ -339,9 +345,9 @@ const ProductFormScreen = ({ route, navigation }) => {
               onRemoveImage={removeImage}
               maxImages={4}
             />
-            {errors.images && (
+            {errors.images && errors.images.length > 0 && (
               <View style={styles.imageError}>
-                <AppInput error={errors.images[0]} editable={false} style={styles.hidden} />
+                <AppInput error={errors.images[0]} editable={false} style={{ height: 0, opacity: 0 }} />
               </View>
             )}
           </View>
