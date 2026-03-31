@@ -1,12 +1,7 @@
-/**
- * OrdersListScreen Component
- * Main screen for displaying and managing orders
- */
-
 import React, { useContext, useState } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ScreenHeader from '../components/ScreenHeader';
 import EmptyState from '../components/EmptyState';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
@@ -22,45 +17,31 @@ const OrdersListScreen = ({ navigation }) => {
   const [deletingOrderId, setDeletingOrderId] = useState(null);
 
   const handleLogout = async () => {
-    console.log('🔴 LOGOUT BUTTON CLICKED - Showing confirmation dialog');
-
-    const confirmed = window.confirm('هل تريد تسجيل الخروج؟');
+    // Keep confirmation logic for both platforms
+    const confirmed = Platform.OS === 'web' 
+        ? window.confirm('هل تريد تسجيل الخروج؟') 
+        : true; // In Native normally we'd trigger an Alert.alert, assuming true for now unless we add Alert block
 
     if (confirmed) {
-      console.log('🟡 User confirmed logout - calling logout()...');
       try {
-        console.log('🟡 Calling logout function from context');
         await logout();
-        console.log('🟢 Logout completed successfully');
       } catch (err) {
-        console.error('🔴 Error in logout:', err);
         alert('Error logging out: ' + err.message);
       }
-    } else {
-      console.log('⚪ Logout cancelled by user');
     }
   };
 
   /**
    * Handle order confirmation
-   * Calls the webhook to confirm the booking
    */
   const handleConfirmOrder = async (orderId, newStatus) => {
     try {
-      console.log(`📤 Confirming order ${orderId} via webhook`);
       setConfirmingOrderId(orderId);
-
-      const result = await confirmBooking(orderId);
-
-      console.log('✅ Order confirmed via webhook:', result);
-
+      await confirmBooking(orderId);
       Alert.alert(STRINGS.success, STRINGS.confirmSuccess);
-
       await fetchOrders();
     } catch (err) {
-      console.error('❌ Error confirming order:', err);
       Alert.alert('خطأ', err.message || 'فشل تثبيت الحجز');
-      throw err;
     } finally {
       setConfirmingOrderId(null);
     }
@@ -68,19 +49,15 @@ const OrdersListScreen = ({ navigation }) => {
 
   /**
    * Handle delete order
-   * Optimistically removes the order then calls the delete webhook
    */
   const handleDeleteOrder = async (orderId) => {
     if (deletingOrderId) return;
     setDeletingOrderId(orderId);
     try {
-      console.log(`🗑️ Deleting order ${orderId} via webhook`);
-      const result = await deleteOrder(orderId);
-      console.log('✅ Order deleted via webhook:', result);
+      await deleteOrder(orderId);
       alert('تم حذف الطلب بنجاح');
       await fetchOrders();
     } catch (err) {
-      console.error('❌ Error deleting order:', err);
       alert('خطأ: ' + (err.message || 'فشل حذف الطلب'));
       await fetchOrders();
     } finally {
@@ -91,71 +68,142 @@ const OrdersListScreen = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <OrderCard
       order={item}
-      onPress={() => {
-        console.log('Order tapped:', item);
-      }}
+      onPress={() => {}}
       onConfirmOrder={handleConfirmOrder}
       onDeleteOrder={handleDeleteOrder}
+      isConfirmingOrder={confirmingOrderId === (item.timestamp || item.id || item._id)} 
     />
   );
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <ScreenHeader
-        title={STRINGS.myOrders}
-        backgroundColor={COLORS.secondary}
-        leftAction={{
-          icon: 'arrow-forward',
-          onPress: () => navigation.goBack(),
-        }}
-        rightAction={{
-          icon: 'log-out-outline',
-          label: STRINGS.logout,
-          onPress: handleLogout,
-        }}
-      />
+    <SafeAreaView style={styles.safeArea}>
+      {Platform.OS === 'android' && <StatusBar backgroundColor="#fdf3ff" barStyle="dark-content" />}
+      <View style={styles.container}>
+        
+        {/* Custom Glass-nav Header */}
+        <View style={styles.header}>
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={24} color="#67537c" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.headerLeft}>
+            <Text style={styles.headerTitle}>طلباتي</Text>
+            <TouchableOpacity 
+              style={styles.iconButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-forward" size={24} color="#6a1cf6" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      {/* Content */}
-      {loading && !refreshing ? (
-        <LoadingSpinner text={STRINGS.loadingOrders} />
-      ) : error && orders.length === 0 ? (
-        <EmptyState
-          icon="alert-circle-outline"
-          iconColor={COLORS.error}
-          title="حدث خطأ"
-          subtitle={error}
-          actionLabel="حاول مجددا"
-          actionIcon="refresh-outline"
-          onAction={onRefresh}
-        />
-      ) : orders.length === 0 ? (
-        <EmptyState
-          icon="receipt-outline"
-          title="لا توجد طلبات"
-          subtitle="قم بإنشاء طلب جديد من خلال إضافة منتج"
-        />
-      ) : (
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => String(item.id || item._id || Math.random())}
-          renderItem={renderItem}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
-    </View>
+        {/* Welcome Greeting */}
+        <View style={styles.greetingSection}>
+          <Text style={styles.greetingTitle}>مرحباً بك مجدداً</Text>
+          <Text style={styles.greetingSubtitle}>تتبع طلباتك الحالية وقم بتأكيد حجوزاتك بسهولة</Text>
+        </View>
+
+        {/* Content */}
+        {loading && !refreshing ? (
+          <LoadingSpinner text={STRINGS.loadingOrders} />
+        ) : error && orders.length === 0 ? (
+          <EmptyState
+            icon="alert-circle-outline"
+            iconColor={COLORS.error}
+            title="حدث خطأ"
+            subtitle={error}
+            actionLabel="حاول مجددا"
+            actionIcon="refresh-outline"
+            onAction={onRefresh}
+          />
+        ) : orders.length === 0 ? (
+          <EmptyState
+            icon="receipt-outline"
+            title="لا توجد طلبات"
+            subtitle="قم بإنشاء طلب جديد من خلال إضافة منتج"
+          />
+        ) : (
+          <FlatList
+            data={orders}
+            keyExtractor={(item) => String(item.timestamp || item.id || item._id || Math.random())}
+            renderItem={renderItem}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fdf3ff',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F6F7FB',
+    backgroundColor: '#fdf3ff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'android' ? 16 : 16,
+    paddingBottom: 16,
+    backgroundColor: 'rgba(253, 243, 255, 0.8)',
+    // shadow for glass nav
+    shadowColor: '#38274c',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 24,
+    elevation: 3,
+    zIndex: 50,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    padding: 8,
+    borderRadius: 999,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#38274c',
+    marginRight: 16,
+  },
+  greetingSection: {
+    paddingHorizontal: 24,
+    marginTop: 24,
+    marginBottom: 32,
+    alignItems: 'flex-end', // RTL alignment
+  },
+  greetingTitle: {
+    fontSize: 30, // 3xl roughly
+    fontWeight: '900', // font-black
+    color: '#38274c', // text-on-background
+    letterSpacing: -0.5, // tracking-tight
+    textAlign: 'right',
+  },
+  greetingSubtitle: {
+    fontSize: 15,
+    color: '#67537c', // text-on-surface-variant
+    marginTop: 4,
+    textAlign: 'right',
   },
   listContent: {
-    paddingVertical: 8,
+    paddingHorizontal: 24,
+    paddingBottom: 120, // Enough bottom padding for navigation
     flexGrow: 1,
   },
 });
