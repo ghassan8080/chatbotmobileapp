@@ -43,29 +43,6 @@ const ProductListScreen = ({ navigation }) => {
     }).start();
   };
 
-  const handleLogout = () => {
-    if (Platform.OS === 'web') {
-        const confirmed = window.confirm(STRINGS.logoutConfirm);
-        if (confirmed) {
-            logout();
-        }
-    } else {
-        Alert.alert(STRINGS.logoutConfirm, '', [
-        {
-            text: STRINGS.cancel,
-            style: 'cancel',
-        },
-        {
-            text: STRINGS.logout,
-            onPress: () => {
-                logout();
-            },
-            style: 'destructive',
-        },
-        ]);
-    }
-  };
-
   const handleDelete = (product) => {
     const productId = product.id || product.product_id || product._id;
 
@@ -117,18 +94,13 @@ const ProductListScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <ScreenHeader
         title={STRINGS.products}
-        leftAction={{
-          icon: 'log-out-outline',
-          onPress: handleLogout,
-        }}
         rightAction={{
           icon: 'notifications-outline',
           label: pendingCount > 0 ? String(pendingCount) : null,
           textColor: pendingCount > 0 ? COLORS.error : null,
-          onPress: () => navigation.navigate(SCREEN_NAMES.ORDERS_LIST),
+          onPress: () => navigation.navigate('Orders'),
         }}
       />
 

@@ -16,20 +16,7 @@ const OrdersListScreen = ({ navigation }) => {
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
   const [deletingOrderId, setDeletingOrderId] = useState(null);
 
-  const handleLogout = async () => {
-    // Keep confirmation logic for both platforms
-    const confirmed = Platform.OS === 'web' 
-        ? window.confirm('هل تريد تسجيل الخروج؟') 
-        : true; // In Native normally we'd trigger an Alert.alert, assuming true for now unless we add Alert block
 
-    if (confirmed) {
-      try {
-        await logout();
-      } catch (err) {
-        alert('Error logging out: ' + err.message);
-      }
-    }
-  };
 
   /**
    * Handle order confirmation
@@ -83,18 +70,9 @@ const OrdersListScreen = ({ navigation }) => {
         {/* Custom Glass-nav Header */}
         <View style={styles.header}>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
-              <Ionicons name="log-out-outline" size={24} color="#67537c" />
-            </TouchableOpacity>
           </View>
           <View style={styles.headerLeft}>
             <Text style={styles.headerTitle}>طلباتي</Text>
-            <TouchableOpacity 
-              style={styles.iconButton} 
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-forward" size={24} color="#6a1cf6" />
-            </TouchableOpacity>
           </View>
         </View>
 

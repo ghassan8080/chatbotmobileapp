@@ -1,11 +1,15 @@
 /**
  * AppNavigator Component
- * Main navigation container for the app
+ * Main navigation container.
+ * - Auth flow: Login → Registration → PendingApproval (Stack)
+ * - Authenticated flow: Bottom Tab (Home | Orders | Profile)
+ *   with sub-stack for ProductForm and ProductDetail (modals).
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { I18nManager } from 'react-native';
 
 // Screens
@@ -13,13 +17,16 @@ import ProductListScreen from '../screens/ProductListScreen';
 import ProductFormScreen from '../screens/ProductFormScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import OrdersListScreen from '../screens/OrdersListScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import PendingApprovalScreen from '../screens/PendingApprovalScreen';
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 
-// Constants
+// Custom Tab Bar
+import CustomTabBar from '../components/CustomTabBar';
+
+// Context & Constants
+import { AuthContext } from '../context/AuthContext';
 import { SCREEN_NAMES } from '../constants/constants';
 
 // Ensure RTL layout is enabled for Arabic
@@ -29,6 +36,41 @@ if (!I18nManager.isRTL) {
 }
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+/**
+ * Bottom Tab Navigator — authenticated users only.
+ * Houses Home (Products), Orders, Profile.
+ */
+const MainTabNavigator = () => (
+  <Tab.Navigator
+    tabBar={(props) => <CustomTabBar {...props} />}
+    screenOptions={{ headerShown: false }}
+  >
+    {/* RTL: tabs render right-to-left visually when device is RTL */}
+    <Tab.Screen name="Home" component={ProductListScreen} />
+    <Tab.Screen name="Orders" component={OrdersListScreen} />
+    <Tab.Screen name="Profile" component={ProfileScreen} />
+  </Tab.Navigator>
+);
+
+/**
+ * Root Stack — sits on top of tabs to allow modal screens (ProductForm, ProductDetail).
+ */
+const AuthenticatedNavigator = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+    <Stack.Screen
+      name={SCREEN_NAMES.PRODUCT_FORM}
+      component={ProductFormScreen}
+      options={{ presentation: 'modal' }}
+    />
+    <Stack.Screen
+      name={SCREEN_NAMES.PRODUCT_DETAIL}
+      component={ProductDetailScreen}
+    />
+  </Stack.Navigator>
+);
 
 const AppNavigator = () => {
   const { user, loading } = useContext(AuthContext);
@@ -37,12 +79,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={user ? SCREEN_NAMES.PRODUCT_LIST : 'Login'}
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -50,27 +87,7 @@ const AppNavigator = () => {
             <Stack.Screen name="PendingApproval" component={PendingApprovalScreen} />
           </>
         ) : (
-          <>
-            <Stack.Screen 
-              name={SCREEN_NAMES.PRODUCT_LIST} 
-              component={ProductListScreen} 
-            />
-            <Stack.Screen 
-              name={SCREEN_NAMES.PRODUCT_FORM} 
-              component={ProductFormScreen} 
-              options={{
-                presentation: 'modal',
-              }}
-            />
-            <Stack.Screen 
-              name={SCREEN_NAMES.PRODUCT_DETAIL} 
-              component={ProductDetailScreen} 
-            />
-            <Stack.Screen 
-              name={SCREEN_NAMES.ORDERS_LIST} 
-              component={OrdersListScreen} 
-            />
-          </>
+          <Stack.Screen name="Authenticated" component={AuthenticatedNavigator} />
         )}
       </Stack.Navigator>
     </NavigationContainer>
