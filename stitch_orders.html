@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>طلباتي - The Amethyst Gallery</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Cairo Font -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#f3e2ff",
+              "inverse-primary": "#9d79ff",
+              "tertiary": "#9d365d",
+              "error": "#b41340",
+              "on-tertiary-fixed": "#380019",
+              "secondary": "#605773",
+              "outline": "#836e99",
+              "background": "#fdf3ff",
+              "on-primary": "#f7f0ff",
+              "on-secondary-fixed-variant": "#605773",
+              "on-background": "#38274c",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#bba4d2",
+              "on-tertiary-fixed-variant": "#70103b",
+              "secondary-fixed-dim": "#dbcff0",
+              "surface-variant": "#ebd4ff",
+              "on-surface-variant": "#67537c",
+              "on-secondary-fixed": "#443b56",
+              "on-primary-fixed": "#000000",
+              "error-dim": "#a70138",
+              "tertiary-fixed-dim": "#f57ca5",
+              "tertiary-dim": "#8d2951",
+              "surface-container-low": "#f9edff",
+              "primary-fixed-dim": "#a07dff",
+              "on-secondary": "#f8f0ff",
+              "on-primary-fixed-variant": "#350088",
+              "surface-bright": "#fdf3ff",
+              "secondary-container": "#eaddff",
+              "on-error": "#ffefef",
+              "on-primary-container": "#2a0070",
+              "surface-container-high": "#efdbff",
+              "on-surface": "#38274c",
+              "secondary-dim": "#544b67",
+              "on-tertiary": "#ffeff1",
+              "surface": "#fdf3ff",
+              "inverse-surface": "#16052a",
+              "inverse-on-surface": "#aa94c1",
+              "primary-dim": "#5d00e3",
+              "surface-container-highest": "#ebd4ff",
+              "primary-fixed": "#ac8eff",
+              "primary": "#6a1cf6",
+              "surface-tint": "#6a1cf6",
+              "on-error-container": "#510017",
+              "secondary-fixed": "#eaddff",
+              "tertiary-fixed": "#ff8db2",
+              "primary-container": "#ac8eff",
+              "surface-dim": "#e5caff",
+              "error-container": "#f74b6d",
+              "on-tertiary-container": "#640332",
+              "on-secondary-container": "#564d69",
+              "tertiary-container": "#ff8db2"
+            },
+            fontFamily: {
+              "headline": ["Cairo", "sans-serif"],
+              "body": ["Cairo", "sans-serif"],
+              "label": ["Cairo", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Cairo', sans-serif; background-color: #fdf3ff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #6a1cf6 0%, #ac8eff 100%);
+        }
+        .glass-nav {
+            background: rgba(253, 243, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        /* Custom scrollbar for premium feel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ac8eff; border-radius: 10px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 glass-nav shadow-[0_8px_24px_-4px_rgba(56,39,76,0.06)]">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-xl mx-auto rtl">
+<div class="flex items-center gap-4">
+<button class="hover:bg-secondary-container/50 transition-colors active:scale-95 duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<h1 class="font-bold text-xl text-on-background">طلباتي</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="hover:bg-secondary-container/50 transition-colors active:scale-95 duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="logout">logout</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-screen-md mx-auto space-y-6">
+<!-- Welcome Greeting Section -->
+<div class="mb-8">
+<h2 class="text-3xl font-black text-on-background tracking-tight">مرحباً بك مجدداً</h2>
+<p class="text-on-surface-variant mt-1">تتبع طلباتك الحالية وقم بتأكيد حجوزاتك بسهولة</p>
+</div>
+<!-- Order Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0_8px_24px_-4px_rgba(56,39,76,0.04)] relative overflow-hidden transition-all hover:shadow-[0_12px_32px_-4px_rgba(56,39,76,0.08)]">
+<!-- Header Section of Card -->
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-[#fff9e6] text-[#b48a00] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+                            قيد الانتظار
+                        </span>
+</div>
+<p class="text-xs text-on-surface-variant">رقم الطلب: <span class="font-bold text-on-background">#7704574521</span></p>
+<p class="text-xs text-on-surface-variant">بتاريخ: 12 أكتوبر 2023</p>
+</div>
+<button class="text-error/40 hover:text-error transition-colors p-2 hover:bg-error/5 rounded-full">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-2 gap-y-4 mb-8">
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">المنتج</span>
+<span class="font-bold text-on-background">تراك سود</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">الكمية</span>
+<span class="font-bold text-on-background">1</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">الهاتف</span>
+<span class="font-bold text-on-background">01092837465</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">العنوان</span>
+<span class="font-bold text-on-background">القاهرة، مدينة نصر</span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="primary-gradient w-full py-4 rounded-xl text-white font-bold text-lg active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="check_circle" data-weight="fill">check_circle</span>
+                تثبيت الحجز
+            </button>
+</div>
+<!-- Order Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0_8px_24px_-4px_rgba(56,39,76,0.04)] relative overflow-hidden transition-all hover:shadow-[0_12px_32px_-4px_rgba(56,39,76,0.08)]">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-[#fff9e6] text-[#b48a00] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+                            قيد الانتظار
+                        </span>
+</div>
+<p class="text-xs text-on-surface-variant">رقم الطلب: <span class="font-bold text-on-background">#8812938475</span></p>
+<p class="text-xs text-on-surface-variant">بتاريخ: 14 أكتوبر 2023</p>
+</div>
+<button class="text-error/40 hover:text-error transition-colors p-2 hover:bg-error/5 rounded-full">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-y-4 mb-8">
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">المنتج</span>
+<span class="font-bold text-on-background">هودي قطني</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">الكمية</span>
+<span class="font-bold text-on-background">2</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">الهاتف</span>
+<span class="font-bold text-on-background">01273645281</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">العنوان</span>
+<span class="font-bold text-on-background">الإسكندرية، سموحة</span>
+</div>
+</div>
+<button class="primary-gradient w-full py-4 rounded-xl text-white font-bold text-lg active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="check_circle" data-weight="fill">check_circle</span>
+                تثبيت الحجز
+            </button>
+</div>
+<!-- Order Card 3 (Status variation example) -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0_8px_24px_-4px_rgba(56,39,76,0.04)] relative overflow-hidden transition-all hover:shadow-[0_12px_32px_-4px_rgba(56,39,76,0.08)] opacity-80">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="local_shipping">local_shipping</span>
+                            تم الشحن
+                        </span>
+</div>
+<p class="text-xs text-on-surface-variant">رقم الطلب: <span class="font-bold text-on-background">#6629384711</span></p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-4 mb-8">
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">المنتج</span>
+<span class="font-bold text-on-background">طقم رياضي كاجوال</span>
+</div>
+<div class="space-y-1">
+<span class="text-xs text-on-surface-variant block">الكمية</span>
+<span class="font-bold text-on-background">1</span>
+</div>
+</div>
+<button class="bg-surface-container-high w-full py-4 rounded-xl text-on-surface-variant/40 font-bold text-lg cursor-not-allowed flex items-center justify-center gap-2" disabled="">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+                تم التأكيد مسبقاً
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full glass-nav shadow-[0_-8px_24px_-4px_rgba(56,39,76,0.08)] rounded-t-[3rem] z-50">
+<div class="flex justify-around items-center px-4 pb-6 pt-3 rtl">
+<a class="flex flex-col items-center justify-center text-[#38274c]/50 px-5 py-2 hover:bg-secondary-container transition-all active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-['Cairo'] text-[12px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center justify-center primary-gradient text-white rounded-full px-5 py-2 shadow-lg shadow-primary/30 active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="receipt_long">receipt_long</span>
+<span class="font-['Cairo'] text-[12px] font-bold">طلباتي</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#38274c]/50 px-5 py-2 hover:bg-secondary-container transition-all active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Cairo'] text-[12px] font-medium">حسابي</span>
+</a>
+</div>
+</nav>
+<!-- Decorative Asymmetric Element -->
+<div class="fixed -bottom-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<div class="fixed top-20 -left-20 w-64 h-64 bg-tertiary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+</body></html>
