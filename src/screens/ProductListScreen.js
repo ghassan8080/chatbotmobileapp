@@ -4,7 +4,7 @@
  */
 
 import React, { useContext, useRef } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform, Animated } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform, Animated, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ScreenHeader from '../components/ScreenHeader';
@@ -93,8 +93,10 @@ const ProductListScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <ScreenHeader
+    <SafeAreaView style={styles.safeArea}>
+      {Platform.OS === 'android' && <StatusBar backgroundColor="#fdf3ff" barStyle="dark-content" />}
+      <View style={styles.container}>
+        <ScreenHeader
         title={STRINGS.products}
         rightAction={{
           icon: 'notifications-outline',
@@ -140,7 +142,8 @@ const ProductListScreen = ({ navigation }) => {
           <Ionicons name="add" size={28} color={COLORS.white} />
         </Animated.View>
       </TouchableOpacity>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -148,9 +151,13 @@ const ProductListScreen = ({ navigation }) => {
 
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fdf3ff',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F6F7FB',
+    backgroundColor: '#fdf3ff',
   },
   listContent: {
     paddingVertical: 8,
