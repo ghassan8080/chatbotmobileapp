@@ -70,18 +70,20 @@ const ImageUploader = ({ images = [], onAddImage, onRemoveImage, maxImages = 4 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginBottom: 8,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#38274c',
+    marginBottom: 4,
+    textAlign: 'right',
   },
   subLabel: {
-    fontSize: 12,
-    color: COLORS.text.secondary,
+    fontSize: 11,
+    color: '#8e7aa8',
     marginBottom: 12,
+    textAlign: 'right',
   },
   imageContainer: {
     flexDirection: 'row',
@@ -112,17 +114,18 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: '#8e7aa8',
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
+    backgroundColor: '#faf7ff',
   },
   addButtonText: {
     fontSize: 12,
-    color: COLORS.primary,
+    color: '#6a1cf6',
     marginTop: 4,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
 });
 

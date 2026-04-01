@@ -125,11 +125,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text.primary,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#8e7aa8',
     marginBottom: 8,
     marginLeft: 4,
+    textAlign: 'right',
   },
   labelError: {
     color: COLORS.error,
@@ -137,9 +138,9 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.input.background,
-    borderRadius: 14,
-    paddingHorizontal: 16,
+    backgroundColor: '#faf7ff',
+    borderRadius: 12,
+    paddingHorizontal: 14,
     minHeight: 52,
   },
   inputWrapperMultiline: {
@@ -156,8 +157,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: 16,
-    color: COLORS.text.primary,
+    fontSize: 15,
+    color: '#38274c',
     paddingVertical: 0,
     textAlign: 'right',
   },

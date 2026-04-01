@@ -10,15 +10,19 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+  Text 
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useProducts } from '../hooks/useProducts';
 import { useImageUpload } from '../hooks/useImageUpload';
 import ImageUploader from '../components/ImageUploader';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ScreenHeader from '../components/ScreenHeader';
 import AppInput from '../components/AppInput';
-import AppButton from '../components/AppButton';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import { validateProductForm } from '../utils/validators';
@@ -285,137 +289,204 @@ const ProductFormScreen = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScreenHeader
-        title={isEditMode ? STRINGS.editProduct : STRINGS.addNewProduct}
-        backgroundColor={COLORS.primary}
-        leftAction={{
-          icon: 'arrow-back',
-          onPress: handleCancel,
-        }}
-      />
+    <SafeAreaView style={styles.safeArea}>
+      {Platform.OS === 'android' && <StatusBar backgroundColor="#fdf3ff" barStyle="dark-content" />}
+      <View style={styles.container}>
+        {/* Custom Glass-nav Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}></View>
+          <View style={styles.headerRight}>
+            <Text style={styles.headerTitle}>{isEditMode ? STRINGS.editProduct : STRINGS.addNewProduct}</Text>
+            <TouchableOpacity onPress={handleCancel} style={styles.iconButton} hitSlop={{top:10, bottom:10, left:10, right:10}}>
+              <Ionicons name="arrow-forward" size={24} color="#38274c" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          {/* Product Info Section */}
-          <View style={styles.section}>
-            <AppInput
-              label={STRINGS.productName}
-              value={formData.name}
-              onChangeText={(text) => handleInputChange('name', text)}
-              placeholder={STRINGS.productName}
-              icon="cube-outline"
-              error={errors.name}
-            />
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Product Info Section */}
+            <View style={styles.cardContainer}>
+              <AppInput
+                label={STRINGS.productName}
+                value={formData.name}
+                onChangeText={(text) => handleInputChange('name', text)}
+                placeholder={STRINGS.productName}
+                icon="cube-outline"
+                error={errors.name}
+              />
 
-            <AppInput
-              label={STRINGS.productDescription}
-              value={formData.description}
-              onChangeText={(text) => handleInputChange('description', text)}
-              placeholder={STRINGS.productDescription}
-              multiline
-              numberOfLines={4}
-              icon="document-text-outline"
-              error={errors.description}
-            />
+              <AppInput
+                label={STRINGS.productDescription}
+                value={formData.description}
+                onChangeText={(text) => handleInputChange('description', text)}
+                placeholder={STRINGS.productDescription}
+                multiline
+                numberOfLines={4}
+                icon="document-text-outline"
+                error={errors.description}
+              />
 
-            <AppInput
-              label={STRINGS.productPrice}
-              value={formData.price}
-              onChangeText={(text) => handleInputChange('price', text)}
-              placeholder={STRINGS.productPrice}
-              keyboardType="decimal-pad"
-              icon="pricetag-outline"
-              error={errors.price}
-            />
-          </View>
-
-          {/* Images Section */}
-          <View style={styles.section}>
-            <ImageUploader
-              images={images}
-              onAddImage={handleAddImage}
-              onRemoveImage={removeImage}
-              maxImages={4}
-            />
-            {errors.images && errors.images.length > 0 && (
-              <View style={styles.imageError}>
-                <AppInput error={errors.images[0]} editable={false} style={{ height: 0, opacity: 0 }} />
-              </View>
-            )}
-          </View>
-
-          {/* Action Buttons */}
-          <View style={styles.buttonContainer}>
-            <View style={styles.buttonWrapper}>
-              <AppButton
-                title={STRINGS.cancel}
-                onPress={handleCancel}
-                variant="secondary"
-                disabled={submitting || uploading}
-                icon="close-outline"
-                size="medium"
+              <AppInput
+                label={STRINGS.productPrice}
+                value={formData.price}
+                onChangeText={(text) => handleInputChange('price', text)}
+                placeholder={STRINGS.productPrice}
+                keyboardType="decimal-pad"
+                icon="pricetag-outline"
+                error={errors.price}
               />
             </View>
 
-            <View style={styles.buttonWrapper}>
-              <AppButton
-                title={isEditMode ? STRINGS.update : STRINGS.add}
+            {/* Images Section */}
+            <View style={styles.cardContainer}>
+              <ImageUploader
+                images={images}
+                onAddImage={handleAddImage}
+                onRemoveImage={removeImage}
+                maxImages={4}
+              />
+              {errors.images && errors.images.length > 0 && (
+                <View style={styles.imageError}>
+                  <Text style={styles.errorText}>{errors.images[0]}</Text>
+                </View>
+              )}
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                activeOpacity={0.8}
                 onPress={handleSubmit}
-                variant="primary"
-                loading={submitting || uploading}
                 disabled={submitting || uploading}
-                icon={submitting || uploading ? undefined : 'checkmark-circle-outline'}
-                size="medium"
-              />
+                style={styles.actionButtonContainer}
+              >
+                <LinearGradient
+                  colors={(submitting || uploading) ? ['#efdbff', '#efdbff'] : ['#6a1cf6', '#ac8eff']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.primaryGradient}
+                >
+                  <Text style={[styles.buttonText, (submitting || uploading) && styles.disabledButtonText]}>
+                    {isEditMode ? STRINGS.update : STRINGS.add}
+                  </Text>
+                  {!(submitting || uploading) && <Ionicons name="add-circle-outline" size={24} color="#ffffff" style={styles.buttonIcon} />}
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fdf3ff',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F6F7FB',
+    backgroundColor: '#fdf3ff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'android' ? 16 : 16,
+    paddingBottom: 16,
+    backgroundColor: 'rgba(253, 243, 255, 0.8)',
+    shadowColor: '#38274c',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 24,
+    elevation: 3,
+    zIndex: 50,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#38274c',
+    marginRight: 16,
+  },
+  iconButton: {
+    padding: 8,
+    borderRadius: 999,
   },
   flex: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 40,
   },
-  section: {
-    backgroundColor: COLORS.white,
+  cardContainer: {
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 20,
     elevation: 3,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowColor: '#38274c',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 16,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    gap: 12,
     marginTop: 8,
+    alignItems: 'center',
   },
-  buttonWrapper: {
-    flex: 1,
+  actionButtonContainer: {
+    width: '100%',
+    shadowColor: '#6a1cf6',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 5,
+  },
+  primaryGradient: {
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 54,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  disabledButtonText: {
+    color: 'rgba(103, 83, 124, 0.4)',
+  },
+  buttonIcon: {
+    marginLeft: 8,
   },
   imageError: {
-    marginTop: -10,
+    marginTop: 8,
+  },
+  errorText: {
+    color: '#b41340',
+    fontSize: 13,
+    textAlign: 'center',
   },
   hidden: {
     height: 0,
