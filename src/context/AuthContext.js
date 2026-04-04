@@ -4,6 +4,7 @@
  */
 
 import React, { createContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { storeUserToken, getUserToken, storeUserId, getUserId, clearAuthData } from '../services/authService';
 import { subscribeAuth } from '../services/authEvents';
 import { loginRequest } from '../api/authApi';
@@ -23,9 +24,15 @@ export const AuthProvider = ({ children }) => {
       try {
         const t = await getUserToken();
         const u = await getUserId();
+        const userDataStr = await AsyncStorage.getItem('user');
+        
         if (t && u) {
           setToken(t);
-          setUser({ id: u });
+          if (userDataStr) {
+            setUser(JSON.parse(userDataStr));
+          } else {
+            setUser({ id: u });
+          }
         }
       } catch (e) {
         console.error('Error hydrating auth state:', e);
@@ -38,6 +45,7 @@ export const AuthProvider = ({ children }) => {
       if (event === 'logout') {
         setToken(null);
         setUser(null);
+        AsyncStorage.removeItem('user').catch(e => console.error(e));
       }
     });
 
@@ -45,14 +53,24 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    // Call backend login - backend must return { user_id, token }
+    // Call backend login - backend must return { user_id, token, name, email, expires_at }
     const data = await loginRequest(credentials);
     if (!data || !data.token || !data.user_id) throw new Error('Invalid login response');
 
     await storeUserToken(data.token);
     await storeUserId(String(data.user_id));
+    
+    const userPayload = {
+      user_id: data.user_id,
+      email: data.email,
+      name: data.name,
+      token: data.token,
+      expires_at: data.expires_at
+    };
+    await AsyncStorage.setItem('user', JSON.stringify(userPayload));
+
     setToken(data.token);
-    setUser({ id: String(data.user_id) });
+    setUser(userPayload);
     return data;
   };
 
