@@ -3,7 +3,7 @@
  * Main screen for displaying and managing products
  */
 
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform, Animated, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -18,12 +18,31 @@ import { AuthContext } from '../context/AuthContext';
 import { getErrorMessage } from '../services/errorHandler';
 
 import { NotificationContext } from '../context/NotificationContext';
+import { useFocusEffect } from '@react-navigation/native';
+import { getChatRequests } from '../api/chatRequestsApi';
 
 const ProductListScreen = ({ navigation }) => {
   const { products, loading, refreshing, onRefresh, removeProduct } = useProducts();
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const { pendingCount } = useContext(NotificationContext);
+  const [chatRequestsCount, setChatRequestsCount] = useState(0);
   const fabScale = useRef(new Animated.Value(1)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchChats = async () => {
+        if (user?.store_name) {
+          try {
+            const reqs = await getChatRequests();
+            setChatRequestsCount(reqs?.length || 0);
+          } catch (e) {
+            console.error('Failed to load chat requests:', e);
+          }
+        }
+      };
+      fetchChats();
+    }, [user])
+  );
 
   const handleFabPressIn = () => {
     Animated.spring(fabScale, {
@@ -100,9 +119,9 @@ const ProductListScreen = ({ navigation }) => {
         title={STRINGS.products}
         rightAction={{
           icon: 'notifications-outline',
-          label: pendingCount > 0 ? String(pendingCount) : null,
-          textColor: pendingCount > 0 ? COLORS.error : null,
-          onPress: () => navigation.navigate('Orders'),
+          label: chatRequestsCount > 0 ? String(chatRequestsCount) : null,
+          textColor: chatRequestsCount > 0 ? COLORS.error : null,
+          onPress: () => navigation.navigate('ChatRequests'),
         }}
       />
 

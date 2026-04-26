@@ -21,6 +21,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import PendingApprovalScreen from '../screens/PendingApprovalScreen';
+import ChatRequestsScreen from '../screens/ChatRequestsScreen';
 
 // Custom Tab Bar
 import CustomTabBar from '../components/CustomTabBar';
@@ -68,6 +69,10 @@ const AuthenticatedNavigator = () => (
     <Stack.Screen
       name={SCREEN_NAMES.PRODUCT_DETAIL}
       component={ProductDetailScreen}
+    />
+    <Stack.Screen
+      name="ChatRequests"
+      component={ChatRequestsScreen}
     />
   </Stack.Navigator>
 );

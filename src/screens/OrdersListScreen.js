@@ -1,20 +1,45 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity, SafeAreaView, Platform, StatusBar } from 'react-native';
+import React, { useContext, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity, SafeAreaView, Platform, StatusBar, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import { COLORS } from '../constants/colors';
 import { STRINGS } from '../constants/strings';
 import OrderCard from '../components/OrderCard';
 import { useOrders } from '../hooks/useOrders';
-import { updateOrderStatus, confirmBooking, deleteOrder } from '../api/ordersApi';
+import { updateOrderStatus, confirmBooking, deleteOrder, getChatRequests, dismissChatRequest } from '../api/ordersApi';
 import { AuthContext } from '../context/AuthContext';
 
 const OrdersListScreen = ({ navigation }) => {
   const { orders, loading, refreshing, onRefresh, error, fetchOrders } = useOrders();
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const [confirmingOrderId, setConfirmingOrderId] = useState(null);
   const [deletingOrderId, setDeletingOrderId] = useState(null);
+  const [chatRequests, setChatRequests] = useState([]);
+
+  const loadChatRequests = async () => {
+    if (user?.store_name) {
+      try {
+        const reqs = await getChatRequests();
+        setChatRequests(reqs);
+      } catch (e) {
+        console.error('Failed to load chat requests:', e);
+      }
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+      loadChatRequests();
+    }, [fetchOrders, user])
+  );
+
+  const handleRefresh = async () => {
+    await onRefresh();
+    await loadChatRequests();
+  };
 
 
 
@@ -50,6 +75,48 @@ const OrdersListScreen = ({ navigation }) => {
     } finally {
       setDeletingOrderId(null);
     }
+  };
+
+  const handleDismissChat = async (senderId) => {
+    try {
+      await dismissChatRequest(senderId);
+      await loadChatRequests();
+    } catch (err) {
+      Alert.alert('خطأ', 'فشل تغيير حالة المحادثة');
+    }
+  };
+
+  const renderChatRequests = () => {
+    if (!user?.store_name || chatRequests.length === 0) return null;
+    return (
+      <View style={{ marginBottom: 24 }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#38274c', marginBottom: 12, textAlign: 'right' }}>
+          زبائن يريدون التحدث 💬
+        </Text>
+        {chatRequests.map(req => (
+          <View key={req.id} style={styles.chatCard}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.chatCardTitle}>زبون يريد التحدث معك مباشرة</Text>
+              <Text style={styles.chatCardSubtitle}>ID: {req.senderId.slice(-8)}</Text>
+              <Text style={styles.chatCardTime}>{new Date(req.requestedAt).toLocaleString('ar-SA')}</Text>
+            </View>
+            <View style={styles.chatCardActions}>
+               <TouchableOpacity style={[styles.chatBtn, { backgroundColor: COLORS.primary }]} onPress={() => Linking.openURL(req.messengerLink)}>
+                 <Text style={styles.chatBtnText}>فتح المحادثة</Text>
+               </TouchableOpacity>
+               <TouchableOpacity style={[styles.chatBtn, { backgroundColor: '#e2e8f0', marginTop: 8 }]} onPress={() => handleDismissChat(req.senderId)}>
+                 <Text style={[styles.chatBtnText, { color: '#38274c' }]}>تم الرد ✓</Text>
+               </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+        {orders.length > 0 && (
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#38274c', marginTop: 16, marginBottom: 8, textAlign: 'right' }}>
+            طلبات جديدة 🛍️
+          </Text>
+        )}
+      </View>
+    );
   };
 
   const renderItem = ({ item }) => (
@@ -93,9 +160,9 @@ const OrdersListScreen = ({ navigation }) => {
             subtitle={error}
             actionLabel="حاول مجددا"
             actionIcon="refresh-outline"
-            onAction={onRefresh}
+            onAction={handleRefresh}
           />
-        ) : orders.length === 0 ? (
+        ) : orders.length === 0 && chatRequests.length === 0 ? (
           <EmptyState
             icon="receipt-outline"
             title="لا توجد طلبات"
@@ -107,9 +174,10 @@ const OrdersListScreen = ({ navigation }) => {
             keyExtractor={(item) => String(item.timestamp || item.id || item._id || Math.random())}
             renderItem={renderItem}
             refreshing={refreshing}
-            onRefresh={onRefresh}
+            onRefresh={handleRefresh}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            ListHeaderComponent={renderChatRequests()}
           />
         )}
       </View>
@@ -184,6 +252,25 @@ const styles = StyleSheet.create({
     paddingBottom: 120, // Enough bottom padding for navigation
     flexGrow: 1,
   },
+  chatCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    shadowColor: '#38274c',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  chatCardTitle: { fontSize: 15, fontWeight: '700', color: '#38274c', textAlign: 'right', marginBottom: 4 },
+  chatCardSubtitle: { fontSize: 13, color: '#67537c', textAlign: 'right', marginBottom: 4 },
+  chatCardTime: { fontSize: 12, color: '#a094ab', textAlign: 'right' },
+  chatCardActions: { marginLeft: 16, minWidth: 100 },
+  chatBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, alignItems: 'center' },
+  chatBtnText: { color: 'white', fontWeight: '600', fontSize: 13 },
 });
 
 export default OrdersListScreen;

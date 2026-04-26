@@ -216,3 +216,54 @@ export const deleteOrder = async (orderId) => {
     throw new Error(error.message || 'Failed to delete order');
   }
 };
+
+/**
+ * Get chat requests
+ * @returns {Promise<Array>} Array of chat requests
+ */
+export const getChatRequests = async () => {
+  try {
+    const response = await fetch(API_ENDPOINTS.CHAT_REQUESTS_WEBHOOK);
+    if (!response.ok) return [];
+    
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : { success: false };
+    
+    if (data.success && data.chat_requests) {
+      return data.chat_requests;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching chat requests:', error);
+    return [];
+  }
+};
+
+/**
+ * Dismiss chat request
+ * @param {string} senderId - Sender ID to dismiss
+ * @returns {Promise<Object>} Response from webhook
+ */
+export const dismissChatRequest = async (senderId) => {
+  try {
+    const payload = { senderId };
+    const response = await fetch(API_ENDPOINTS.DISMISS_CHAT_REQUEST_WEBHOOK, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook failed: ${response.statusText}`);
+    }
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : { success: true };
+    return data;
+  } catch (error) {
+    console.error('Error dismissing chat request:', error);
+    throw new Error(error.message || 'Failed to dismiss chat request');
+  }
+};
