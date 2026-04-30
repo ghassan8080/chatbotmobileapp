@@ -17,12 +17,10 @@ export const NotificationProvider = ({ children }) => {
       // Check if sound file exists or use default
       // Ideally we bundle a sound. For now, try to load.
       // If fails, we just log and skip sound.
-      const { sound } = await Audio.Sound.createAsync(
-         // Placeholder: user needs to add 'notification.mp3' to assets/sounds/
-         // If missing, this throws, caught below.
-         require('../../assets/sounds/notification.mp3') 
-      );
-      soundRef.current = sound;
+      // const { sound } = await Audio.Sound.createAsync(
+      //    require('../../assets/sounds/notification.mp3') 
+      // );
+      // soundRef.current = sound;
     } catch (error) {
       console.log('Notification Sound not loaded (file missing?):', error);
     }

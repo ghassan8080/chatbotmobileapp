@@ -65,8 +65,10 @@ export const AuthProvider = ({ children }) => {
       email: data.email,
       name: data.name,
       token: data.token,
-      expires_at: data.expires_at
+      expires_at: data.expires_at,
+      store_name: data.store_name || data.user?.store_name || (data.user_id === 1 || data.user_id === '1' ? 'متجر تيست' : null),
     };
+    console.log('User Payload to save:', JSON.stringify(userPayload, null, 2));
     await AsyncStorage.setItem('user', JSON.stringify(userPayload));
 
     setToken(data.token);

@@ -97,7 +97,7 @@ const OrdersListScreen = ({ navigation }) => {
           <View key={req.id} style={styles.chatCard}>
             <View style={{ flex: 1 }}>
               <Text style={styles.chatCardTitle}>زبون يريد التحدث معك مباشرة</Text>
-              <Text style={styles.chatCardSubtitle}>ID: {req.senderId.slice(-8)}</Text>
+              <Text style={styles.chatCardSubtitle}>الزبون: {req.customerName}</Text>
               <Text style={styles.chatCardTime}>{new Date(req.requestedAt).toLocaleString('ar-SA')}</Text>
             </View>
             <View style={styles.chatCardActions}>

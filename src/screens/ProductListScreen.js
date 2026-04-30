@@ -20,29 +20,52 @@ import { getErrorMessage } from '../services/errorHandler';
 import { NotificationContext } from '../context/NotificationContext';
 import { useFocusEffect } from '@react-navigation/native';
 import { getChatRequests } from '../api/chatRequestsApi';
+import { getOrders } from '../api/ordersApi';
 
 const ProductListScreen = ({ navigation }) => {
   const { products, loading, refreshing, onRefresh, removeProduct } = useProducts();
   const { logout, user } = useContext(AuthContext);
   const { pendingCount } = useContext(NotificationContext);
-  const [chatRequestsCount, setChatRequestsCount] = useState(0);
+  const [ordersBadge, setOrdersBadge] = useState(0);
+  const [chatBadge, setChatBadge] = useState(0);
+  const [totalBadge, setTotalBadge] = useState(0);
   const fabScale = useRef(new Animated.Value(1)).current;
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchChats = async () => {
+      const fetchBadgeCounts = async () => {
         if (user?.store_name) {
           try {
-            const reqs = await getChatRequests();
-            setChatRequestsCount(reqs?.length || 0);
+            const [ordersRes, chatRes] = await Promise.all([
+              getOrders(),
+              getChatRequests()
+            ]);
+            const pending = ordersRes.filter(o => o.status === 'pending').length;
+            const chatCount = chatRes.length;
+            setOrdersBadge(pending);
+            setChatBadge(chatCount);
+            setTotalBadge(pending + chatCount);
           } catch (e) {
-            console.error('Failed to load chat requests:', e);
+            console.error('Failed to load badge counts:', e);
           }
         }
       };
-      fetchChats();
+      
+      fetchBadgeCounts();
+      const interval = setInterval(fetchBadgeCounts, 30000);
+      return () => clearInterval(interval);
     }, [user])
   );
+
+  const handleBellPress = () => {
+    if (chatBadge > 0) {
+      navigation.navigate('ChatRequests');
+    } else if (ordersBadge > 0) {
+      navigation.navigate('Orders');
+    } else {
+      navigation.navigate('Orders');
+    }
+  };
 
   const handleFabPressIn = () => {
     Animated.spring(fabScale, {
@@ -119,9 +142,9 @@ const ProductListScreen = ({ navigation }) => {
         title={STRINGS.products}
         rightAction={{
           icon: 'notifications-outline',
-          label: chatRequestsCount > 0 ? String(chatRequestsCount) : null,
-          textColor: chatRequestsCount > 0 ? COLORS.error : null,
-          onPress: () => navigation.navigate('ChatRequests'),
+          badgeCount: totalBadge,
+          badgeColor: chatBadge > 0 ? '#6a1cf6' : (ordersBadge > 0 ? '#f59e0b' : null),
+          onPress: handleBellPress,
         }}
       />
 

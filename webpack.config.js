@@ -13,5 +13,11 @@ module.exports = async function (env, argv) {
             },
         };
     }
+
+    config.resolve.fallback = {
+        ...config.resolve.fallback,
+        crypto: false,
+    };
+
     return config;
 };

@@ -66,6 +66,8 @@ export const API_ENDPOINTS = {
   DELETE_ORDER_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/delete-order',
   CHAT_REQUESTS_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/chat-requests',
   DISMISS_CHAT_REQUEST_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/dismiss-chat-request',
+  COMMENT_REPLY_RULES_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/comment-reply-rules',
+  DELETE_COMMENT_REPLY_RULE_WEBHOOK: 'https://n8n-n8n.17m6co.easypanel.host/webhook/delete-comment-reply-rule',
 };
 
 // API Request Configuration

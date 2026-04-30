@@ -71,12 +71,19 @@ const ScreenHeader = ({
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               {rightAction.icon && (
-                <Ionicons
-                  name={rightAction.icon}
-                  size={22}
-                  color={rightAction.textColor || titleColor}
-                  style={rightAction.label ? styles.actionIcon : null}
-                />
+                <View>
+                  <Ionicons
+                    name={rightAction.icon}
+                    size={22}
+                    color={rightAction.textColor || titleColor}
+                    style={rightAction.label ? styles.actionIcon : null}
+                  />
+                  {rightAction.badgeCount > 0 && (
+                    <View style={[styles.badge, { backgroundColor: rightAction.badgeColor || COLORS.error }]}>
+                      <Text style={styles.badgeText}>{rightAction.badgeCount}</Text>
+                    </View>
+                  )}
+                </View>
               )}
               {rightAction.label && (
                 <Text style={[styles.actionLabel, { color: rightAction.textColor || titleColor }]}>
@@ -137,6 +144,24 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     letterSpacing: 0.3,
+  },
+  badge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingHorizontal: 4,
   },
 });
 

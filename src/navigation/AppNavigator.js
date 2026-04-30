@@ -22,6 +22,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import PendingApprovalScreen from '../screens/PendingApprovalScreen';
 import ChatRequestsScreen from '../screens/ChatRequestsScreen';
+import CommentReplyRulesScreen from '../screens/CommentReplyRulesScreen';
 
 // Custom Tab Bar
 import CustomTabBar from '../components/CustomTabBar';
@@ -43,17 +44,22 @@ const Tab = createBottomTabNavigator();
  * Bottom Tab Navigator — authenticated users only.
  * Houses Home (Products), Orders, Profile.
  */
-const MainTabNavigator = () => (
-  <Tab.Navigator
-    tabBar={(props) => <CustomTabBar {...props} />}
-    screenOptions={{ headerShown: false }}
-  >
-    {/* RTL: tabs render right-to-left visually when device is RTL */}
-    <Tab.Screen name="Home" component={ProductListScreen} />
-    <Tab.Screen name="Orders" component={OrdersListScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
-  </Tab.Navigator>
-);
+const MainTabNavigator = () => {
+  const { user } = useContext(AuthContext);
+  
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      {/* RTL: tabs render right-to-left visually when device is RTL */}
+      <Tab.Screen name="Home" component={ProductListScreen} />
+      <Tab.Screen name="Orders" component={OrdersListScreen} />
+      <Tab.Screen name="ChatRequests" component={ChatRequestsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+};
 
 /**
  * Root Stack — sits on top of tabs to allow modal screens (ProductForm, ProductDetail).
@@ -71,8 +77,8 @@ const AuthenticatedNavigator = () => (
       component={ProductDetailScreen}
     />
     <Stack.Screen
-      name="ChatRequests"
-      component={ChatRequestsScreen}
+      name={SCREEN_NAMES.COMMENT_REPLY_RULES}
+      component={CommentReplyRulesScreen}
     />
   </Stack.Navigator>
 );

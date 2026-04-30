@@ -54,7 +54,7 @@ const ChatRequestsScreen = ({ navigation }) => {
         </View>
         
         <View style={styles.cardBody}>
-          <Text style={styles.detailText}>ID: ...{item.senderId?.slice(-6) || 'Unknown'}</Text>
+          <Text style={styles.detailText}>الزبون: {item.customerName}</Text>
           <Text style={styles.timeText}>{timeText}</Text>
         </View>
 
