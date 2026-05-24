@@ -1,0 +1,1 @@
+{"nodes": [{"id": "n8n_user_credentials_table", "label": "DataTable: user_credentials", "file_type": "code", "source_file": "docs/N8N_MULTITENANT_SETUP.md", "source_location": "1. CREATE USER CREDENTIALS TABLE"}], "edges": [], "hyperedges": []}
