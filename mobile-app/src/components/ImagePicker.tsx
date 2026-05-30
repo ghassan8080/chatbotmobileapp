@@ -4,13 +4,11 @@ import {
     StyleSheet,
     Image,
     ScrollView,
-    TouchableOpacity,
     Alert,
-    Platform,
 } from 'react-native';
 import { Button, IconButton, Text } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary, Asset, PhotoQuality } from 'react-native-image-picker';
 import { ProductImage } from '../types/product';
 import { spacing } from '../theme';
 import { validateImageSize } from '../utils/imageUtils';
@@ -61,7 +59,7 @@ const ImagePickerComponent: React.FC<ImagePickerComponentProps> = ({
             setLoading(true);
             const result = await launchCamera({
                 mediaType: 'photo',
-                quality: config.imageQuality,
+                quality: config.imageQuality as PhotoQuality,
                 includeBase64: false,
                 maxWidth: 1024,
                 maxHeight: 1024,
@@ -88,7 +86,7 @@ const ImagePickerComponent: React.FC<ImagePickerComponentProps> = ({
             setLoading(true);
             const result = await launchImageLibrary({
                 mediaType: 'photo',
-                quality: config.imageQuality,
+                quality: config.imageQuality as PhotoQuality,
                 selectionLimit: maxImages - images.length,
                 includeBase64: false,
                 maxWidth: 1024,
