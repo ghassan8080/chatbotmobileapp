@@ -11,6 +11,9 @@ on:
     branches:
       - dev
 
+permissions:
+  contents: read
+
 jobs:
   # ----------------------------------------------------
   # Job 1: Lint Code (ESLint)
@@ -24,6 +27,8 @@ jobs:
     steps:
       - name: 🔍 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -52,6 +57,8 @@ jobs:
     steps:
       - name: 🔍 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -93,6 +100,8 @@ jobs:
     steps:
       - name: 🔍 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -130,6 +139,8 @@ jobs:
     steps:
       - name: 🔍 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -156,6 +167,8 @@ jobs:
     steps:
       - name: 🔍 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -214,10 +227,13 @@ jobs:
     needs: [lint, unit-test, integration-test, build, coverage-check]
     if: always() && github.event_name == 'pull_request'
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - name: 🔍 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: ✍️ Post PR Status Comment
         uses: actions/github-script@v7
