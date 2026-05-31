@@ -187,8 +187,8 @@ jobs:
           const summaryPath = 'coverage/coverage-summary.json';
 
           if (!fs.existsSync(summaryPath)) {
-            console.log('⚠️  No coverage summary found — skipping enforcement for initial setup.');
-            process.exit(0);
+            console.error('❌ Error: Coverage summary file not found at ' + summaryPath);
+            process.exit(1);
           }
 
           const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
