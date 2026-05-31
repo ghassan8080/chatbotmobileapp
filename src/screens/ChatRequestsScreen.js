@@ -1,16 +1,26 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Platform, StatusBar, Linking } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getChatRequests, dismissChatRequest } from '../api/chatRequestsApi';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyState from '../components/EmptyState';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { AuthContext } from '../context/AuthContext';
 
 const ChatRequestsScreen = ({ navigation }) => {
+  const { user } = useContext(AuthContext);
   const [chatRequests, setChatRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Immediate authorization guard to navigate away if unauthorized
+  useEffect(() => {
+    if (!user?.store_name) {
+      navigation.navigate('Home');
+    }
+  }, [user, navigation]);
+
   const loadRequests = async () => {
+    if (!user?.store_name) return;
     try {
       const data = await getChatRequests();
       setChatRequests(data);
@@ -23,9 +33,16 @@ const ChatRequestsScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      loadRequests();
-    }, [])
+      if (user?.store_name) {
+        loadRequests();
+      }
+    }, [user?.store_name])
   );
+
+  // Return null if not authorized so nothing renders or triggers side effects
+  if (!user?.store_name) {
+    return null;
+  }
 
   const handleDismiss = async (senderId) => {
     try {
