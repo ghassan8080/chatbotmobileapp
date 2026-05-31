@@ -119,8 +119,7 @@ jobs:
             npm run test:integration
           else
             echo "No test:integration script found — running Jest with integration pattern."
-            npx jest --testPathPattern="integration" --passWithNoTests \
-              || echo "🟢 No integration tests yet — skipping."
+            npx jest --testPathPattern="integration" --passWithNoTests
           fi
         env:
           NODE_ENV: test
