@@ -1,14 +1,14 @@
 // Mock for react-native-paper
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text as RNText, TouchableOpacity } from 'react-native';
 
 export const Card: any = ({ children, onPress, style }: any) => (
   <TouchableOpacity onPress={onPress} style={style}>{children}</TouchableOpacity>
 );
 Card.Content = ({ children }: any) => <View>{children}</View>;
 
-export const Text: any = ({ children, style, variant, numberOfLines }: any) => (
-  <Text style={style} numberOfLines={numberOfLines}>{children}</Text>
+export const Text: any = ({ children, style, _variant, numberOfLines }: any) => (
+  <RNText style={style} numberOfLines={numberOfLines}>{children}</RNText>
 );
 
 export const IconButton = ({ onPress, icon, testID }: any) => (
@@ -17,7 +17,7 @@ export const IconButton = ({ onPress, icon, testID }: any) => (
 
 export const Button = ({ children, onPress, loading, disabled }: any) => (
   <TouchableOpacity onPress={onPress} disabled={disabled || loading}>
-    <Text>{children}</Text>
+    <RNText>{children}</RNText>
   </TouchableOpacity>
 );
 

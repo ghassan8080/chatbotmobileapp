@@ -12,13 +12,33 @@ jest.mock('react-i18next', () => ({
 
 // Silence console.error noise from expected test scenarios
 const originalError = console.error;
-beforeAll(() => {
-  console.error = (...args: any[]) => {
-    // Suppress react-native act() warnings in tests
-    if (typeof args[0] === 'string' && args[0].includes('Warning:')) return;
-    originalError(...args);
-  };
-});
-afterAll(() => {
-  console.error = originalError;
-});
+console.error = (...args: any[]) => {
+  // Suppress react-native act() warnings in tests
+  if (typeof args[0] === 'string' && args[0].includes('Warning:')) {
+    return;
+  }
+  originalError(...args);
+};
+
+// Add missing React Native mocks
+jest.mock('react-native', () => ({
+  ...jest.requireActual('react-native'),
+  NativeModules: {
+    RNSecureKeyStore: {
+      get: jest.fn(),
+      set: jest.fn(),
+      remove: jest.fn(),
+    },
+  },
+  Platform: {
+    OS: 'ios',
+    select: (obj: any) => obj.ios || obj.default,
+  },
+}));
+
+// Mock AsyncStorage if used
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+}));
