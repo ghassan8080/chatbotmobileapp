@@ -1,0 +1,15 @@
+node_modules/
+.git/
+.expo/
+artifacts/
+web-build/
+dist/
+build/
+android/
+ios/
+.agents/
+.agent/
+graphify-out/
+testsprite_tests/
+package-lock.json
+*.log

@@ -15,10 +15,13 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
+import { SCREEN_NAMES } from '../constants/constants';
 
 const ProfileScreen = () => {
   const { user, logout } = useContext(AuthContext);
+  const navigation = useNavigation();
 
   const handleLogout = () => {
     if (Platform.OS === 'web') {
@@ -76,6 +79,21 @@ const ProfileScreen = () => {
               <Text style={styles.infoLabel}>رقم الهاتف</Text>
             </View>
           )}
+        </View>
+
+        {/* Features Card */}
+        <View style={styles.card}>
+          <TouchableOpacity 
+            style={styles.featureRow}
+            onPress={() => navigation.navigate(SCREEN_NAMES.COMMENT_REPLY_RULES)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.featureRowContent}>
+              <Ionicons name="chatbubbles-outline" size={20} color="#6a1cf6" />
+              <Text style={styles.featureText}>إدارة ردود التعليقات</Text>
+            </View>
+            <Ionicons name="chevron-back" size={20} color="#c0b3cf" />
+          </TouchableOpacity>
         </View>
 
         {/* Logout Button */}
@@ -166,6 +184,22 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   infoValue: {
+    fontSize: 15,
+    color: '#38274c',
+    fontWeight: '600',
+  },
+  featureRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  featureRowContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  featureText: {
     fontSize: 15,
     color: '#38274c',
     fontWeight: '600',

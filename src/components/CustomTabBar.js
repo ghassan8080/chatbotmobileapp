@@ -6,7 +6,7 @@
  * RTL layout: Profile (حسابي) | Orders (طلباتي) | Home (الرئيسية)
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AuthContext } from '../context/AuthContext';
 
 const TAB_CONFIG = [
   {
@@ -23,6 +24,12 @@ const TAB_CONFIG = [
     label: 'حسابي',
     icon: 'person-outline',
     iconActive: 'person',
+  },
+  {
+    name: 'ChatRequests',
+    label: 'استفسارات',
+    icon: 'chatbubble-ellipses-outline',
+    iconActive: 'chatbubble-ellipses',
   },
   {
     name: 'Orders',
@@ -40,12 +47,15 @@ const TAB_CONFIG = [
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
+  const { user } = useContext(AuthContext);
 
   return (
     <View style={[styles.wrapper, { paddingBottom: insets.bottom || 12 }]}>
       <View style={styles.container}>
         {/* RTL order: Profile | Orders (active) | Home */}
         {TAB_CONFIG.map((tab) => {
+          if (tab.name === 'ChatRequests' && !user?.store_name) return null;
+
           // Find the matching route from React Nav state
           const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
           if (routeIndex === -1) return null;

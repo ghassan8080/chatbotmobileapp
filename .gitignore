@@ -62,3 +62,8 @@ web-build/
 
 # Ignore package-lock if using yarn
 yarn.lock
+artifacts/
+
+# Generated / AI tooling outputs (local-only, never commit)
+graphify-out/
+

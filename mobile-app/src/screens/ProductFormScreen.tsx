@@ -64,12 +64,11 @@ const ProductFormScreen: React.FC = () => {
                 ...imageData,
             };
 
-            let response;
             if (mode === 'edit' && existingProduct) {
-                response = await apiService.updateProduct(existingProduct.id, formData);
+                await apiService.updateProduct(existingProduct.id, formData);
                 Alert.alert(t('common.success'), t('product.updateSuccess'));
             } else {
-                response = await apiService.addProduct(formData);
+                await apiService.addProduct(formData);
                 Alert.alert(t('common.success'), t('product.addSuccess'));
             }
 

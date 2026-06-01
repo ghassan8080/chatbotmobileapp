@@ -3,13 +3,12 @@ import {
     View,
     Image,
     StyleSheet,
-    TouchableOpacity,
     Dimensions,
 } from 'react-native';
 import { Card, Text, IconButton } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { Product } from '../types/product';
-import { spacing, fontSize, shadows } from '../theme';
+import { spacing, shadows } from '../theme';
 
 interface ProductCardProps {
     product: Product;

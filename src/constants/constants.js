@@ -10,6 +10,7 @@ export const SCREEN_NAMES = {
   PRODUCT_DETAIL: 'ProductDetail',
   ORDERS_LIST: 'OrdersList',
   SETTINGS: 'Settings',
+  COMMENT_REPLY_RULES: 'CommentReplyRules',
 };
 
 // Image Picker Options
